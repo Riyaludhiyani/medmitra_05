@@ -623,8 +623,13 @@ function Home() {
 
           <div className="footer-section">
             <h4>Contact</h4>
-            <p>📧 medmitra385@gmail.com</p>
-            <p>📞 +91 9691881619</p>
+<div className="footer-section">
+  <h4>Contact</h4>
+  <p>📧 support@medmitra.com</p>
+  <p>📞 +91 1234567890</p>
+  <p>📍 Indore, Madhya Pradesh</p>
+</div>
+
             <p>📍 Indore, Madhya Pradesh</p>
           </div>
         </div>
