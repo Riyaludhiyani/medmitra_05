@@ -8,7 +8,7 @@ const cron = require("node-cron");
 
 const app = express();
 app.use(express.json());
-use(cors({
+app.use(cors({
     origin : "http://localhost:5173",
     credentials:true
 }));
