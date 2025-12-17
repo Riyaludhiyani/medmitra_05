@@ -32,7 +32,7 @@ const EmployeeSchema = new mongoose.Schema({
       vaccineName: String,
       nextDoseDate: String,
       doseNumber: Number,
-      totalDoses: Number,
+      totalDoses: Number,  
       completed: { type: Boolean, default: false }
     }
   ]
