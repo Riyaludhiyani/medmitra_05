@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import Eye Icons
 import "./Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // State for toggling visibility
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -37,7 +39,7 @@ function Login() {
           <Link to="/" className="back-link">
             ← Back to Home
           </Link>
-          
+
           <div className="login-logo">
             <div className="logo-icon-login">
               <span>M</span>
@@ -47,7 +49,9 @@ function Login() {
           </div>
 
           <h2 className="login-title">Welcome Back</h2>
-          <p className="login-subtitle">Sign in to continue your healthcare journey</p>
+          <p className="login-subtitle">
+            Sign in to continue your healthcare journey
+          </p>
 
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-group">
@@ -65,15 +69,25 @@ function Login() {
 
             <div className="form-group">
               <label htmlFor="password">Password</label>
-              <input
-                id="password"
-                type="password"
-                className="form-input"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              {/* Wrapped input and icon in a relative container */}
+              <div className="password-wrapper">
+                <input
+                  id="password"
+                  // Dynamic type: 'text' if showPassword is true, else 'password'
+                  type={showPassword ? "text" : "password"}
+                  className="form-input"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <span
+                  className="password-toggle-icon"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
             </div>
 
             <button type="submit" className="btn-login-submit">

@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
+
 import axios from "axios";
 
 import {
@@ -28,6 +29,9 @@ import {
 
   FaTimes,
 
+FaRobot,
+FaMagic,
+
 } from "react-icons/fa";
 
 import { useNavigate } from "react-router-dom";
@@ -40,6 +44,7 @@ function Home() {
   const [onlyShowNotifications, setOnlyShowNotifications] = useState(false);
 
   const [showProfile, setShowProfile] = useState(false);
+const [showNotificationModal, setShowNotificationModal] = useState(false);
 
   const [editMode, setEditMode] = useState(false);
 
@@ -73,6 +78,8 @@ function Home() {
 
   const [loadingOutbreaks, setLoadingOutbreaks] = useState(false);
 
+const [aiTip, setAiTip] = useState(null);
+const [loadingTip, setLoadingTip] = useState(false);
 
 
   const navigate = useNavigate();
@@ -96,306 +103,158 @@ function Home() {
   // Comprehensive health tips database
 
   const allHealthTips = [
-
-    {
-
-      category: "Hydration",
-
-      tip: "Drink at least 8 glasses of water daily to maintain proper hydration and support bodily functions.",
-
-      icon: "💧",
-
-    },
-
-    {
-
-      category: "Sleep",
-
-      tip: "Sleep 7–8 hours every night to allow your body to repair and rejuvenate.",
-
-      icon: "😴",
-
-    },
-
-    {
-
-      category: "Exercise",
-
-      tip: "Exercise at least 30 minutes a day to improve cardiovascular health and boost mood.",
-
-      icon: "🏃",
-
-    },
-
-    {
-
-      category: "Nutrition",
-
-      tip: "Avoid junk food and eat more fruits and vegetables for essential vitamins and minerals.",
-
-      icon: "🥗",
-
-    },
-
-    {
-
-      category: "Mental Health",
-
-      tip: "Practice breathing exercises or meditation to reduce stress and improve mental clarity.",
-
-      icon: "🧘",
-
-    },
-
-    {
-
-      category: "Hygiene",
-
-      tip: "Wash your hands frequently with soap for at least 20 seconds to prevent infections.",
-
-      icon: "🧼",
-
-    },
-
-    {
-
-      category: "Screen Time",
-
-      tip: "Limit screen time and follow the 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds.",
-
-      icon: "👁️",
-
-    },
-
-    {
-
-      category: "Movement",
-
-      tip: "Take a short walk every hour if sitting for long periods to prevent blood clots and stiffness.",
-
-      icon: "🚶",
-
-    },
-
-    {
-
-      category: "Nutrition",
-
-      tip: "Include protein-rich foods like eggs, fish, legumes, and nuts in your daily diet.",
-
-      icon: "🥚",
-
-    },
-
-    {
-
-      category: "Mental Health",
-
-      tip: "Practice gratitude daily by writing down three things you're thankful for.",
-
-      icon: "📝",
-
-    },
-
-    {
-
-      category: "Exercise",
-
-      tip: "Include strength training exercises at least twice a week to maintain muscle mass.",
-
-      icon: "💪",
-
-    },
-
-    {
-
-      category: "Sleep",
-
-      tip: "Maintain a consistent sleep schedule by going to bed and waking up at the same time daily.",
-
-      icon: "⏰",
-
-    },
-
-    {
-
-      category: "Hydration",
-
-      tip: "Start your day with a glass of water to kickstart your metabolism.",
-
-      icon: "☀️",
-
-    },
-
-    {
-
-      category: "Nutrition",
-
-      tip: "Reduce sugar intake and opt for natural sweeteners like honey or dates.",
-
-      icon: "🍯",
-
-    },
-
-    {
-
-      category: "Hygiene",
-
-      tip: "Brush your teeth twice daily and floss to maintain oral health.",
-
-      icon: "🦷",
-
-    },
-
-    {
-
-      category: "Mental Health",
-
-      tip: "Connect with friends and family regularly to maintain social bonds and emotional health.",
-
-      icon: "👨‍👩‍👧",
-
-    },
-
-    {
-
-      category: "Exercise",
-
-      tip: "Try yoga or stretching exercises to improve flexibility and reduce tension.",
-
-      icon: "🧘‍♀️",
-
-    },
-
-    {
-
-      category: "Nutrition",
-
-      tip: "Eat fiber-rich foods like whole grains, oats, and vegetables for better digestion.",
-
-      icon: "🌾",
-
-    },
-
-    {
-
-      category: "Prevention",
-
-      tip: "Get regular health check-ups and screenings to catch potential issues early.",
-
-      icon: "🏥",
-
-    },
-
-    {
-
-      category: "Immunity",
-
-      tip: "Include vitamin C-rich foods like citrus fruits, bell peppers, and broccoli in your diet.",
-
-      icon: "🍊",
-
-    },
-
-    {
-
-      category: "Heart Health",
-
-      tip: "Reduce salt intake to lower blood pressure and improve heart health.",
-
-      icon: "❤️",
-
-    },
-
-    {
-
-      category: "Bone Health",
-
-      tip: "Get adequate vitamin D through sunlight exposure or supplements for strong bones.",
-
-      icon: "☀️",
-
-    },
-
-    {
-
-      category: "Digestion",
-
-      tip: "Eat probiotic-rich foods like yogurt and fermented foods for gut health.",
-
-      icon: "🥛",
-
-    },
-
-    {
-
-      category: "Weight Management",
-
-      tip: "Practice portion control and eat mindfully without distractions.",
-
-      icon: "🍽️",
-
-    },
-
-    {
-
-      category: "Skin Care",
-
-      tip: "Use sunscreen with at least SPF 30 daily to protect your skin from UV damage.",
-
-      icon: "🧴",
-
-    },
-
-    {
-
-      category: "Prevention",
-
-      tip: "Keep up to date with your vaccination schedule to prevent infectious diseases.",
-
-      icon: "💉",
-
-    },
-
-    {
-
-      category: "Mental Health",
-
-      tip: "Limit caffeine intake, especially in the evening, for better sleep quality.",
-
-      icon: "☕",
-
-    },
-
-    {
-
-      category: "Exercise",
-
-      tip: "Take the stairs instead of the elevator to increase daily physical activity.",
-
-      icon: "🪜",
-
-    },
-
-    {
-
-      category: "Hygiene",
-
-      tip: "Change your bedsheets weekly to prevent skin issues and allergies.",
-
-      icon: "🛏️",
-
-    },
-
-    {
-
-      category: "Nutrition",
-
-      tip: "Stay away from processed foods and cook fresh meals whenever possible.",
-
-      icon: "🍳",
-
-    },
+const allHealthTips = [
+  {
+    category: "Hydration",
+    tip: "Drink at least 8 glasses of water daily to maintain proper hydration and support bodily functions.",
+    icon: "💧",
+  },
+  {
+    category: "Sleep",
+    tip: "Sleep 7–8 hours every night to allow your body to repair and rejuvenate.",
+    icon: "😴",
+  },
+  {
+    category: "Exercise",
+    tip: "Exercise at least 30 minutes a day to improve cardiovascular health and boost mood.",
+    icon: "🏃",
+  },
+  {
+    category: "Nutrition",
+    tip: "Avoid junk food and eat more fruits and vegetables for essential vitamins and minerals.",
+    icon: "🥗",
+  },
+  {
+    category: "Mental Health",
+    tip: "Practice breathing exercises or meditation to reduce stress and improve mental clarity.",
+    icon: "🧘",
+  },
+  {
+    category: "Hygiene",
+    tip: "Wash your hands frequently with soap for at least 20 seconds to prevent infections.",
+    icon: "🧼",
+  },
+  {
+    category: "Screen Time",
+    tip: "Limit screen time and follow the 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds.",
+    icon: "👁️",
+  },
+  {
+    category: "Movement",
+    tip: "Take a short walk every hour if sitting for long periods to prevent blood clots and stiffness.",
+    icon: "🚶",
+  },
+  {
+    category: "Nutrition",
+    tip: "Include protein-rich foods like eggs, fish, legumes, and nuts in your daily diet.",
+    icon: "🥚",
+  },
+  {
+    category: "Mental Health",
+    tip: "Practice gratitude daily by writing down three things you're thankful for.",
+    icon: "📝",
+  },
+  {
+    category: "Exercise",
+    tip: "Include strength training exercises at least twice a week to maintain muscle mass.",
+    icon: "💪",
+  },
+  {
+    category: "Sleep",
+    tip: "Maintain a consistent sleep schedule by going to bed and waking up at the same time daily.",
+    icon: "⏰",
+  },
+  {
+    category: "Hydration",
+    tip: "Start your day with a glass of water to kickstart your metabolism.",
+    icon: "☀️",
+  },
+  {
+    category: "Nutrition",
+    tip: "Reduce sugar intake and opt for natural sweeteners like honey or dates.",
+    icon: "🍯",
+  },
+  {
+    category: "Hygiene",
+    tip: "Brush your teeth twice daily and floss to maintain oral health.",
+    icon: "🦷",
+  },
+  {
+    category: "Mental Health",
+    tip: "Connect with friends and family regularly to maintain social bonds and emotional health.",
+    icon: "👨‍👩‍👧",
+  },
+  {
+    category: "Exercise",
+    tip: "Try yoga or stretching exercises to improve flexibility and reduce tension.",
+    icon: "🧘‍♀️",
+  },
+  {
+    category: "Nutrition",
+    tip: "Eat fiber-rich foods like whole grains, oats, and vegetables for better digestion.",
+    icon: "🌾",
+  },
+  {
+    category: "Prevention",
+    tip: "Get regular health check-ups and screenings to catch potential issues early.",
+    icon: "🏥",
+  },
+  {
+    category: "Immunity",
+    tip: "Include vitamin C-rich foods like citrus fruits, bell peppers, and broccoli in your diet.",
+    icon: "🍊",
+  },
+  {
+    category: "Heart Health",
+    tip: "Reduce salt intake to lower blood pressure and improve heart health.",
+    icon: "❤️",
+  },
+  {
+    category: "Bone Health",
+    tip: "Get adequate vitamin D through sunlight exposure or supplements for strong bones.",
+    icon: "☀️",
+  },
+  {
+    category: "Digestion",
+    tip: "Eat probiotic-rich foods like yogurt and fermented foods for gut health.",
+    icon: "🥛",
+  },
+  {
+    category: "Weight Management",
+    tip: "Practice portion control and eat mindfully without distractions.",
+    icon: "🍽️",
+  },
+  {
+    category: "Skin Care",
+    tip: "Use sunscreen with at least SPF 30 daily to protect your skin from UV damage.",
+    icon: "🧴",
+  },
+  {
+    category: "Prevention",
+    tip: "Keep up to date with your vaccination schedule to prevent infectious diseases.",
+    icon: "💉",
+  },
+  {
+    category: "Mental Health",
+    tip: "Limit caffeine intake, especially in the evening, for better sleep quality.",
+    icon: "☕",
+  },
+  {
+    category: "Exercise",
+    tip: "Take the stairs instead of the elevator to increase daily physical activity.",
+    icon: "🪜",
+  },
+  {
+    category: "Hygiene",
+    tip: "Change your bedsheets weekly to prevent skin issues and allergies.",
+    icon: "🛏️",
+  },
+  {
+    category: "Nutrition",
+    tip: "Stay away from processed foods and cook fresh meals whenever possible.",
+    icon: "🍳",
+  },
+];
 
   ];
 
@@ -415,6 +274,36 @@ function Home() {
 
     : allHealthTips;
 
+
+const generateAiTip = () => {
+  setLoadingTip(true);
+  setAiTip(null); // Clear previous tip
+
+  // Simulate AI processing delay
+  setTimeout(() => {
+    // Pick a random health tip
+    const randomIndex = Math.floor(Math.random() * allHealthTips.length);
+    const rawTip = allHealthTips[randomIndex];
+
+    // AI-style intros
+    const intros = [
+      `Hello ${user?.name || "Friend"}, based on general wellness data, here is your focus:`,
+      "Analyzing your health profile... Here is a recommendation:",
+      "Medmitra AI suggests focusing on this today:",
+      "For optimal vitality, try incorporating this:",
+      "Here is a scientifically backed wellness tip for you:",
+    ];
+
+    const randomIntro = intros[Math.floor(Math.random() * intros.length)];
+
+    setAiTip({
+      intro: randomIntro,
+      ...rawTip,
+    });
+
+    setLoadingTip(false);
+  }, 1500);
+};
 
 
   // Fetch User
@@ -521,85 +410,29 @@ function Home() {
 
   // Fetch outbreak data - Replace with real API call
 
-  const fetchOutbreakData = async () => {
+// Fetch outbreak data - REAL LIVE API CALL
+const fetchOutbreakData = async () => {
+  const userCity = user?.city;
 
-    if (!user?.city) return;
+  if (!userCity) {
+    alert("Please update your profile with your City to see local alerts.");
+    return;
+  }
 
-    setLoadingOutbreaks(true);
+  setLoadingOutbreaks(true);
 
-
-
-    // Simulated data - replace with real API
-
-    setTimeout(() => {
-
-      setOutbreakData([
-
-        {
-
-          disease: "Dengue",
-
-          cases: 45,
-
-          severity: "High",
-
-          lastUpdated: "2 days ago",
-
-          color: "#ef4444",
-
-        },
-
-        {
-
-          disease: "Malaria",
-
-          cases: 12,
-
-          severity: "Medium",
-
-          lastUpdated: "1 week ago",
-
-          color: "#f59e0b",
-
-        },
-
-        {
-
-          disease: "Typhoid",
-
-          cases: 8,
-
-          severity: "Low",
-
-          lastUpdated: "3 days ago",
-
-          color: "#10b981",
-
-        },
-
-        {
-
-          disease: "Chikungunya",
-
-          cases: 23,
-
-          severity: "Medium",
-
-          lastUpdated: "5 days ago",
-
-          color: "#f59e0b",
-
-        },
-
-      ]);
-
+  axios
+    .get(`http://localhost:3001/outbreaks?city=${userCity}`)
+    .then((res) => {
+      console.log("Outbreak Data:", res.data);
+      setOutbreakData(res.data.alerts || []);
       setLoadingOutbreaks(false);
-
-    }, 1000);
-
-  };
-
-
+    })
+    .catch((err) => {
+      console.error("Error fetching outbreaks:", err);
+      setLoadingOutbreaks(false);
+    });
+};
 
   // Profile Toggle
 
@@ -684,10 +517,16 @@ function Home() {
   // Find Hospitals
 
   const findNearbyHospitals = () => {
+// Safety checks before proceeding
+if (!navigator.geolocation) {
+  alert("Geolocation is not supported by your browser");
+  return;
+}
 
-    if (!user?.city) {
-
-      alert("City information not available in your profile");
+if (!user?.city) {
+  alert("City information not available in your profile");
+  return;
+}
 
       return;
 
@@ -695,27 +534,73 @@ function Home() {
 
     setSearchingHospitals(true);
 
-    axios
+// Start searching
+setSearchingHospitals(true);
 
-      .get(`http://localhost:3001/hospitals?city=${user.city}&radius=5000`)
+// Prefer GPS-based search
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude } = position.coords;
 
-      .then((res) => {
-
-        setHospitals(res.data.hospitals || []);
-
+      // Call backend with lat/lon
+      axios
+        .get(
+          `http://localhost:3001/hospitals?lat=${latitude}&lon=${longitude}`
+        )
+        .then((res) => {
+          setHospitals(res.data.hospitals || []);
+          setSearchingHospitals(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("Error finding hospitals");
+          setSearchingHospitals(false);
+        });
+    },
+    () => {
+      // GPS denied → fallback to city
+      if (!user?.city) {
+        alert("Location access denied and city not available in profile.");
         setSearchingHospitals(false);
+        return;
+      }
 
-      })
+      axios
+        .get(
+          `http://localhost:3001/hospitals?city=${user.city}&radius=5000`
+        )
+        .then((res) => {
+          setHospitals(res.data.hospitals || []);
+          setSearchingHospitals(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("Error finding hospitals");
+          setSearchingHospitals(false);
+        });
+    }
+  );
+} else {
+  // Browser does not support GPS → city fallback
+  if (!user?.city) {
+    alert("Geolocation not supported and city not available in profile.");
+    setSearchingHospitals(false);
+    return;
+  }
 
-      .catch((err) => {
-
-        console.log(err);
-
-        alert("Error finding hospitals");
-
-        setSearchingHospitals(false);
-
-      });
+  axios
+    .get(`http://localhost:3001/hospitals?city=${user.city}&radius=5000`)
+    .then((res) => {
+      setHospitals(res.data.hospitals || []);
+      setSearchingHospitals(false);
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("Error finding hospitals");
+      setSearchingHospitals(false);
+    });
+}
 
   };
 
@@ -724,32 +609,71 @@ function Home() {
   // Emergency Help - FIXED
 
   // Emergency Help - CONNECTED TO BACKEND
-  const handleEmergency = () => {
-    if (!user || !user.email) return;
+// Emergency Help - CONNECTED TO BACKEND
+const handleEmergency = () => {
+  if (!user || !user.email) return;
 
-    // Call Backend API
-    axios.post(`http://localhost:3001/emergency/${user.email}`)
-      .then((res) => {
-        // Handle Missing Contacts
-        if (res.data.status === "MissingContacts") {
-           alert(res.data.message + "\n\nRedirecting to Edit Profile...");
-           setEditMode(true);
-        } 
-        // Handle Success
-        else if (res.data.status === "Success") {
-           const contacts = res.data.notified.join("\n✓ ");
-           alert(`🚨 EMERGENCY ALERTS SENT 🚨\n\nNotified:\n✓ ${contacts}\n\nHelp is on the way!`);
+  axios
+    .post(`http://localhost:3001/emergency/${user.email}`)
+    .then((res) => {
+      const { status, message, notified, matchedUsers } = res.data;
+
+      // No or missing emergency contacts
+      if (status === "MissingContacts" || status === "NoContacts") {
+        alert(
+          (message || "No emergency contacts found.") +
+            "\n\nRedirecting to Edit Profile..."
+        );
+        setEditMode(true);
+        return;
+      }
+
+      // Success with detailed contact list
+      if (status === "Success" && Array.isArray(notified)) {
+        const contacts = notified.join("\n✓ ");
+        alert(
+          `🚨 EMERGENCY ALERTS SENT 🚨\n\nNotified:\n✓ ${contacts}\n\nHelp is on the way!`
+        );
+        return;
+      }
+
+      // Fallback success (backend matched app users)
+      if (matchedUsers) {
+        alert(
+          `🚨 EMERGENCY SENT 🚨\n\nAlert sent to ${matchedUsers} app users.\nSMS triggered for offline contacts.`
+        );
+        return;
+      }
+
+      // Unknown response
+      alert("Emergency request sent. Please stay calm and safe.");
+    })
+    .catch((err) => {
+      console.error("Emergency error:", err);
+      alert("Failed to send emergency alert. Please try again.");
+    });
+};
+
         }
       })
       .catch((err) => {
         console.error(err);
-        // Fallback if server fails
-        if(err.response && err.response.status === 400) {
-            alert("Please add emergency contacts in your profile first.");
-            setEditMode(true);
-        } else {
-            alert("Error sending alerts. Please call 100/102 immediately.");
-        }
+.catch((err) => {
+  console.error("Emergency error:", err);
+
+  // Fallback if server responds with missing contacts
+  if (err.response && err.response.status === 400) {
+    alert("Please add emergency contacts in your profile first.");
+    setEditMode(true);
+  } 
+  // Critical fallback
+  else {
+    alert(
+      "Error sending alerts. Please call emergency numbers (100 / 102) immediately."
+    );
+  }
+});
+
       });
   };
 
@@ -846,14 +770,10 @@ function Home() {
 
         <div className="header-right">
 
-          <div
-
-            className="notification-icon-wrapper"
-
-            onClick={() => {
-              setOnlyShowNotifications(true); 
-              setShowVaccinationSchedule(true);
-            }}
+<div
+  className="notification-icon-wrapper"
+  onClick={() => setShowNotificationModal(true)}
+>
 
           >
 
@@ -1050,7 +970,11 @@ function Home() {
 
             className="feature-card-home card-blue"
 
-            onClick={() => setShowHealthTips(true)}
+onClick={() => {
+  setShowHealthTips(true);
+  generateAiTip();
+}}
+
 
           >
 
@@ -1194,24 +1118,36 @@ function Home() {
 
 
 
-                    {/* Inside Home.jsx Footer Section */}
+{/* Inside Home.jsx Footer Section */}
+
           <div className="footer-section">
+
             <h4>Quick Links</h4>
+
             <ul>
+
               <li>
-                <Link to="/about">About Us</Link>
+<a href="#about">About Us</a>
+
               </li>
+
               <li>
-                <Link to="/contact">Contact</Link>
+<a href="#contact">Contact</a>
+
               </li>
+
               <li>
-                <Link to="/privacy">Privacy Policy</Link>
+<a href="#privacy">Privacy Policy</a>
+
               </li>
+
               <li>
-                <Link to="/terms">Terms of Service</Link>
+<a href="#terms">Terms of Service</a>
+
               </li>
+
             </ul>
-           </div>
+</div>
 
 
 
@@ -1231,7 +1167,8 @@ function Home() {
 
         <div className="footer-bottom">
 
-          <p>© 2025 Medmitra. All rights reserved.</p>
+<p>© 2025 Medmitra. All rights reserved.</p>
+
 
         </div>
 
@@ -1648,120 +1585,138 @@ function Home() {
       {showHealthTips && (
 
         <div className="modal-overlay" onClick={() => setShowHealthTips(false)}>
+<div
+  className="modal-content modal-large"
+  onClick={(e) => e.stopPropagation()}
+>
+  {/* ---------- HEADER ---------- */}
+  <div className="modal-header">
+    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <FaRobot size={24} color="#2563eb" />
+      <h2 style={{ margin: 0 }}>Health Tips & AI Insights</h2>
+    </div>
+    <FaTimes
+      className="modal-close"
+      onClick={() => setShowHealthTips(false)}
+    />
+  </div>
+
+  {/* ---------- AI INSIGHT SECTION ---------- */}
+  <div
+    style={{
+      padding: "20px",
+      borderBottom: "1px solid #e5e7eb",
+      textAlign: "center",
+    }}
+  >
+    {loadingTip ? (
+      <>
+        <div
+          className="loading-spinner"
+          style={{
+            width: "40px",
+            height: "40px",
+            borderColor: "#2563eb transparent #2563eb transparent",
+          }}
+        />
+        <p style={{ marginTop: "15px", color: "#666", fontStyle: "italic" }}>
+          Analyzing health patterns...
+        </p>
+      </>
+    ) : (
+      aiTip && (
+        <div className="ai-result-card">
+          <p style={{ color: "#64748b", fontSize: "0.9rem" }}>
+            {aiTip.intro}
+          </p>
 
           <div
-
-            className="modal-content modal-large"
-
-            onClick={(e) => e.stopPropagation()}
-
+            style={{
+              background:
+                "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)",
+              padding: "20px",
+              borderRadius: "16px",
+              border: "1px solid #bfdbfe",
+              marginTop: "10px",
+            }}
           >
+            <div style={{ fontSize: "2.5rem" }}>{aiTip.icon}</div>
+            <h3 style={{ color: "#1e40af" }}>{aiTip.category}</h3>
+            <p style={{ color: "#1e3a8a", fontWeight: "500" }}>
+              "{aiTip.tip}"
+            </p>
+          </div>
 
-            <div className="modal-header">
+          <button
+            onClick={generateAiTip}
+            style={{
+              marginTop: "20px",
+              padding: "10px 22px",
+              background: "#2563eb",
+              color: "white",
+              border: "none",
+              borderRadius: "30px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginInline: "auto",
+            }}
+          >
+            <FaMagic /> Generate New Tip
+          </button>
+        </div>
+      )
+    )}
+  </div>
 
-              <h2>💡 Health Tips Library</h2>
+  {/* ---------- SEARCH ---------- */}
+  <div className="search-container">
+    <FaSearch className="search-icon" />
+    <input
+      type="text"
+      placeholder="Search health tips by category or keyword..."
+      value={healthTipsSearch}
+      onChange={(e) => setHealthTipsSearch(e.target.value)}
+      className="search-input"
+    />
+    {healthTipsSearch && (
+      <FaTimes
+        className="clear-search"
+        onClick={() => setHealthTipsSearch("")}
+      />
+    )}
+  </div>
 
-              <FaTimes
+  <div className="tips-count">
+    Showing {filteredHealthTips.length} of {allHealthTips.length} health tips
+  </div>
 
-                className="modal-close"
+  {/* ---------- TIPS GRID ---------- */}
+  <div className="tips-grid-enhanced">
+    {filteredHealthTips.map((item, index) => (
+      <div key={index} className="tip-card-enhanced">
+        <div className="tip-icon">{item.icon}</div>
+        <div className="tip-content">
+          <span className="tip-category">{item.category}</span>
+          <p className="tip-text">{item.tip}</p>
+        </div>
+      </div>
+    ))}
+  </div>
 
-                onClick={() => setShowHealthTips(false)}
-
-              />
-
-            </div>
-
-
-
-            <div className="search-container">
-
-              <FaSearch className="search-icon" />
-
-              <input
-
-                type="text"
-
-                placeholder="Search health tips by category or keyword..."
-
-                value={healthTipsSearch}
-
-                onChange={(e) => setHealthTipsSearch(e.target.value)}
-
-                className="search-input"
-
-              />
-
-              {healthTipsSearch && (
-
-                <FaTimes
-
-                  className="clear-search"
-
-                  onClick={() => setHealthTipsSearch("")}
-
-                />
-
-              )}
-
-            </div>
-
-
-
-            <div className="tips-count">
-
-              Showing {filteredHealthTips.length} of {allHealthTips.length}{" "}
-
-              health tips
-
-            </div>
-
-
-
-            <div className="tips-grid-enhanced">
-
-              {filteredHealthTips.map((item, index) => (
-
-                <div key={index} className="tip-card-enhanced">
-
-                  <div className="tip-icon">{item.icon}</div>
-
-                  <div className="tip-content">
-
-                    <span className="tip-category">{item.category}</span>
-
-                    <p className="tip-text">{item.tip}</p>
-
-                  </div>
-
-                </div>
-
-              ))}
-
-            </div>
-
-
-
-            {filteredHealthTips.length === 0 && (
-
-              <div className="no-results">
-
-                <p>No health tips found matching "{healthTipsSearch}"</p>
-
-                <button
-
-                  onClick={() => setHealthTipsSearch("")}
-
-                  className="btn-clear-search"
-
-                >
-
-                  Clear Search
-
-                </button>
-
-              </div>
-
-            )}
+  {filteredHealthTips.length === 0 && (
+    <div className="no-results">
+      <p>No health tips found matching "{healthTipsSearch}"</p>
+      <button
+        onClick={() => setHealthTipsSearch("")}
+        className="btn-clear-search"
+      >
+        Clear Search
+      </button>
+    </div>
+  )}
+</div>
 
           </div>
 
@@ -1843,15 +1798,25 @@ function Home() {
 
                       </div>
 
+{/* NEW: Show Distance if available */}
+{hospital?.dist && (
+  <p
+    style={{
+      color: "#2563eb",
+      fontWeight: "bold",
+      fontSize: "0.9rem",
+      margin: "5px 0",
+    }}
+  >
+    📍 {(hospital.dist / 1000).toFixed(1)} km away
+  </p>
+)}
 
-
-                      <p className="hospital-address">
-
-                        📍 {hospital?.address?.street || ""}{" "}
-
-                        {hospital?.address?.housenumber || ""},{" "}
-
-                        {hospital?.address?.city || user.city}
+<p className="hospital-address">
+  📍 {hospital?.address?.street || ""}{" "}
+  {hospital?.address?.housenumber || ""},{" "}
+  {hospital?.address?.city || user.city}
+</p>
 
                       </p>
 
@@ -1863,7 +1828,7 @@ function Home() {
 
                       )}
 
-
+{/* FIXED GOOGLE MAPS LINK */}
 
                       <a
 
@@ -1876,8 +1841,7 @@ function Home() {
                         className="btn-directions"
 
                       >
-
-                        Get Directions →
+Get Directions 🗺️
 
                       </a>
 
@@ -2015,73 +1979,63 @@ function Home() {
 
                       </div>
 
-                      <div className="outbreak-prevention">
+<div
+  className="outbreak-prevention"
+  style={{ marginTop: "15px", borderTop: "1px solid #eee", paddingTop: "10px" }}
+>
+  <h5 style={{ margin: "0 0 5px 0", color: "#333" }}>
+    Safety Tips:
+  </h5>
 
-                        <h5>Prevention Tips:</h5>
+  <ul style={{ paddingLeft: "20px", margin: 0 }}>
+    {/* Prefer backend-provided tips */}
+    {Array.isArray(outbreak.tips) && outbreak.tips.length > 0 ? (
+      outbreak.tips.map((tip, tIdx) => (
+        <li
+          key={tIdx}
+          style={{ fontSize: "0.9rem", color: "#555", marginBottom: "4px" }}
+        >
+          {tip}
+        </li>
+      ))
+    ) : (
+      <>
+        {/* Fallback static tips by disease */}
+        {outbreak.disease === "Dengue" && (
+          <>
+            <li>Use mosquito repellent</li>
+            <li>Wear long-sleeved clothes</li>
+            <li>Remove standing water</li>
+          </>
+        )}
 
-                        <ul>
+        {outbreak.disease === "Malaria" && (
+          <>
+            <li>Sleep under mosquito nets</li>
+            <li>Use insect repellent</li>
+            <li>Keep surroundings clean</li>
+          </>
+        )}
 
-                          {outbreak.disease === "Dengue" && (
+        {outbreak.disease === "Typhoid" && (
+          <>
+            <li>Drink boiled or purified water</li>
+            <li>Wash hands frequently</li>
+            <li>Avoid street food</li>
+          </>
+        )}
 
-                            <>
-
-                              <li>Use mosquito repellent</li>
-
-                              <li>Wear long-sleeved clothes</li>
-
-                              <li>Remove standing water</li>
-
-                            </>
-
-                          )}
-
-                          {outbreak.disease === "Malaria" && (
-
-                            <>
-
-                              <li>Sleep under mosquito nets</li>
-
-                              <li>Use insect repellent</li>
-
-                              <li>Keep surroundings clean</li>
-
-                            </>
-
-                          )}
-
-                          {outbreak.disease === "Typhoid" && (
-
-                            <>
-
-                              <li>Drink boiled or purified water</li>
-
-                              <li>Wash hands frequently</li>
-
-                              <li>Avoid street food</li>
-
-                            </>
-
-                          )}
-
-                          {outbreak.disease === "Chikungunya" && (
-
-                            <>
-
-                              <li>Eliminate mosquito breeding sites</li>
-
-                              <li>Use mosquito repellent</li>
-
-                              <li>Wear protective clothing</li>
-
-                            </>
-
-                          )}
-
-                        </ul>
-
-                      </div>
-
-                    </div>
+        {outbreak.disease === "Chikungunya" && (
+          <>
+            <li>Eliminate mosquito breeding sites</li>
+            <li>Use mosquito repellent</li>
+            <li>Wear protective clothing</li>
+          </>
+        )}
+      </>
+    )}
+  </ul>
+</div>
 
                   ))}
 
@@ -2402,6 +2356,126 @@ function Home() {
         }}
 
       />
+
+{/* ----------------------------- */}
+{/* PURE NOTIFICATION MODAL       */}
+{/* ----------------------------- */}
+{showNotificationModal && (
+  <div
+    className="modal-overlay"
+    onClick={() => setShowNotificationModal(false)}
+  >
+    <div
+      className="modal-content"
+      onClick={(e) => e.stopPropagation()}
+      style={{ maxWidth: "450px" }}
+    >
+      <div className="modal-header">
+        <h2>🔔 Notifications</h2>
+        <FaTimes
+          className="modal-close"
+          onClick={() => setShowNotificationModal(false)}
+        />
+      </div>
+
+      <div
+        className="notifications-list-container"
+        style={{ maxHeight: "400px", overflowY: "auto" }}
+      >
+        {notifications.length === 0 ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "20px",
+              color: "#666",
+            }}
+          >
+            <FaBell
+              style={{
+                fontSize: "30px",
+                marginBottom: "10px",
+                opacity: 0.3,
+              }}
+            />
+            <p>No new notifications</p>
+          </div>
+        ) : (
+          notifications.map((n, idx) => (
+            <div
+              key={idx}
+              style={{
+                padding: "15px",
+                borderBottom: "1px solid #eee",
+                backgroundColor:
+                  n.type === "emergency" ? "#fff5f5" : "#fff",
+                borderLeft:
+                  n.type === "emergency"
+                    ? "4px solid #ef4444"
+                    : "4px solid #4299e1",
+                marginBottom: "10px",
+                borderRadius: "4px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "5px",
+                }}
+              >
+                {n.type === "emergency" ? (
+                  <FaExclamationTriangle
+                    color="#ef4444"
+                    style={{ marginRight: "8px" }}
+                  />
+                ) : (
+                  <FaSyringe
+                    color="#4299e1"
+                    style={{ marginRight: "8px" }}
+                  />
+                )}
+                <strong style={{ color: "#333" }}>
+                  {n.type === "emergency"
+                    ? "Emergency Alert"
+                    : "Vaccine Reminder"}
+                </strong>
+              </div>
+
+              <p
+                style={{
+                  margin: 0,
+                  color: "#555",
+                  fontSize: "0.95rem",
+                }}
+              >
+                {n.message}
+              </p>
+
+              <small
+                style={{
+                  color: "#999",
+                  marginTop: "5px",
+                  display: "block",
+                }}
+              >
+                {new Date(n.date).toLocaleDateString()}
+              </small>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div className="modal-actions">
+        <button
+          className="btn-cancel"
+          onClick={() => setShowNotificationModal(false)}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
     </div>
 
