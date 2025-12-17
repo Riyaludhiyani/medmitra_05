@@ -1,6 +1,9 @@
+/* eslint-disable no-unused-vars */
 // Home.js - COMPLETE IMPROVED VERSION
 
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+
 
 import axios from "axios";
 
@@ -26,9 +29,8 @@ import {
 
   FaTimes,
 
-  FaRobot,
-
-  FaMagic,
+FaRobot,
+FaMagic,
 
 } from "react-icons/fa";
 
@@ -42,7 +44,8 @@ function Home() {
   const [onlyShowNotifications, setOnlyShowNotifications] = useState(false);
 
   const [showProfile, setShowProfile] = useState(false);
-const [showNotificationModal, setShowNotificationModal] = useState(false); 
+const [showNotificationModal, setShowNotificationModal] = useState(false);
+
   const [editMode, setEditMode] = useState(false);
 
   const [showVaccinationForm, setShowVaccinationForm] = useState(false);
@@ -75,8 +78,9 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
 
   const [loadingOutbreaks, setLoadingOutbreaks] = useState(false);
 
-  const [aiTip, setAiTip] = useState(null);
-  const [loadingTip, setLoadingTip] = useState(false);
+const [aiTip, setAiTip] = useState(null);
+const [loadingTip, setLoadingTip] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -99,36 +103,159 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
   // Comprehensive health tips database
 
   const allHealthTips = [
-    { category: "Hydration", tip: "Drink at least 8 glasses of water daily.", icon: "💧" },
-    { category: "Sleep", tip: "Sleep 7–8 hours every night for repair.", icon: "😴" },
-    { category: "Exercise", tip: "30 minutes of cardio improves heart health.", icon: "🏃" },
-    { category: "Nutrition", tip: "Eat a rainbow of vegetables for vitamins.", icon: "🥗" },
-    { category: "Mental Health", tip: "5 minutes of meditation reduces cortisol.", icon: "🧘" },
-    { category: "Hygiene", tip: "Wash hands for 20 seconds to kill germs.", icon: "🧼" },
-    { category: "Eyes", tip: "Follow the 20-20-20 rule for screen time.", icon: "👁️" },
-    { category: "Movement", tip: "Stand up and stretch every hour.", icon: "🚶" },
-    { category: "Protein", tip: "Include eggs or lentils in your breakfast.", icon: "🥚" },
-    { category: "Gratitude", tip: "Write down 3 things you are grateful for.", icon: "📝" },
-    { category: "Strength", tip: "Lift weights twice a week for bone density.", icon: "💪" },
-    { category: "Routine", tip: "Wake up at the same time every day.", icon: "⏰" },
-    { category: "Morning", tip: "Drink warm water with lemon first thing.", icon: "☀️" },
-    { category: "Sugar", tip: "Replace soda with sparkling water or tea.", icon: "🍯" },
-    { category: "Dental", tip: "Floss daily, not just when food is stuck.", icon: "🦷" },
-    { category: "Social", tip: "Call a friend; social connection boosts immunity.", icon: "👨‍👩‍👧" },
-    { category: "Flexibility", tip: "Touch your toes daily to keep spine flexible.", icon: "🧘‍♀️" },
-    { category: "Fiber", tip: "Oats and apples are great for digestion.", icon: "🌾" },
-    { category: "Checkup", tip: "Schedule your annual blood work today.", icon: "🏥" },
-    { category: "Vitamin C", tip: "Oranges and peppers boost your immune system.", icon: "🍊" },
-    { category: "Heart", tip: "Reduce salt to keep blood pressure stable.", icon: "❤️" },
-    { category: "Sun", tip: "15 mins of morning sun helps Vitamin D levels.", icon: "☀️" },
-    { category: "Gut", tip: "Yogurt is great for your gut bacteria.", icon: "🥛" },
-    { category: "Mindful Eating", tip: "Chew your food slowly to aid digestion.", icon: "🍽️" },
-    { category: "Skin", tip: "Sunscreen is needed even on cloudy days.", icon: "🧴" },
-    { category: "Vaccine", tip: "Check if your Tetanus shot is up to date.", icon: "💉" },
-    { category: "Caffeine", tip: "Stop caffeine by 4 PM for better sleep.", icon: "☕" },
-    { category: "Stairs", tip: "Take the stairs; it counts as a mini-workout.", icon: "🪜" },
-    { category: "Bedding", tip: "Wash pillowcases weekly for clear skin.", icon: "🛏️" },
-    { category: "Cooking", tip: "Cook at home to control sodium and oil.", icon: "🍳" },
+const allHealthTips = [
+  {
+    category: "Hydration",
+    tip: "Drink at least 8 glasses of water daily to maintain proper hydration and support bodily functions.",
+    icon: "💧",
+  },
+  {
+    category: "Sleep",
+    tip: "Sleep 7–8 hours every night to allow your body to repair and rejuvenate.",
+    icon: "😴",
+  },
+  {
+    category: "Exercise",
+    tip: "Exercise at least 30 minutes a day to improve cardiovascular health and boost mood.",
+    icon: "🏃",
+  },
+  {
+    category: "Nutrition",
+    tip: "Avoid junk food and eat more fruits and vegetables for essential vitamins and minerals.",
+    icon: "🥗",
+  },
+  {
+    category: "Mental Health",
+    tip: "Practice breathing exercises or meditation to reduce stress and improve mental clarity.",
+    icon: "🧘",
+  },
+  {
+    category: "Hygiene",
+    tip: "Wash your hands frequently with soap for at least 20 seconds to prevent infections.",
+    icon: "🧼",
+  },
+  {
+    category: "Screen Time",
+    tip: "Limit screen time and follow the 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds.",
+    icon: "👁️",
+  },
+  {
+    category: "Movement",
+    tip: "Take a short walk every hour if sitting for long periods to prevent blood clots and stiffness.",
+    icon: "🚶",
+  },
+  {
+    category: "Nutrition",
+    tip: "Include protein-rich foods like eggs, fish, legumes, and nuts in your daily diet.",
+    icon: "🥚",
+  },
+  {
+    category: "Mental Health",
+    tip: "Practice gratitude daily by writing down three things you're thankful for.",
+    icon: "📝",
+  },
+  {
+    category: "Exercise",
+    tip: "Include strength training exercises at least twice a week to maintain muscle mass.",
+    icon: "💪",
+  },
+  {
+    category: "Sleep",
+    tip: "Maintain a consistent sleep schedule by going to bed and waking up at the same time daily.",
+    icon: "⏰",
+  },
+  {
+    category: "Hydration",
+    tip: "Start your day with a glass of water to kickstart your metabolism.",
+    icon: "☀️",
+  },
+  {
+    category: "Nutrition",
+    tip: "Reduce sugar intake and opt for natural sweeteners like honey or dates.",
+    icon: "🍯",
+  },
+  {
+    category: "Hygiene",
+    tip: "Brush your teeth twice daily and floss to maintain oral health.",
+    icon: "🦷",
+  },
+  {
+    category: "Mental Health",
+    tip: "Connect with friends and family regularly to maintain social bonds and emotional health.",
+    icon: "👨‍👩‍👧",
+  },
+  {
+    category: "Exercise",
+    tip: "Try yoga or stretching exercises to improve flexibility and reduce tension.",
+    icon: "🧘‍♀️",
+  },
+  {
+    category: "Nutrition",
+    tip: "Eat fiber-rich foods like whole grains, oats, and vegetables for better digestion.",
+    icon: "🌾",
+  },
+  {
+    category: "Prevention",
+    tip: "Get regular health check-ups and screenings to catch potential issues early.",
+    icon: "🏥",
+  },
+  {
+    category: "Immunity",
+    tip: "Include vitamin C-rich foods like citrus fruits, bell peppers, and broccoli in your diet.",
+    icon: "🍊",
+  },
+  {
+    category: "Heart Health",
+    tip: "Reduce salt intake to lower blood pressure and improve heart health.",
+    icon: "❤️",
+  },
+  {
+    category: "Bone Health",
+    tip: "Get adequate vitamin D through sunlight exposure or supplements for strong bones.",
+    icon: "☀️",
+  },
+  {
+    category: "Digestion",
+    tip: "Eat probiotic-rich foods like yogurt and fermented foods for gut health.",
+    icon: "🥛",
+  },
+  {
+    category: "Weight Management",
+    tip: "Practice portion control and eat mindfully without distractions.",
+    icon: "🍽️",
+  },
+  {
+    category: "Skin Care",
+    tip: "Use sunscreen with at least SPF 30 daily to protect your skin from UV damage.",
+    icon: "🧴",
+  },
+  {
+    category: "Prevention",
+    tip: "Keep up to date with your vaccination schedule to prevent infectious diseases.",
+    icon: "💉",
+  },
+  {
+    category: "Mental Health",
+    tip: "Limit caffeine intake, especially in the evening, for better sleep quality.",
+    icon: "☕",
+  },
+  {
+    category: "Exercise",
+    tip: "Take the stairs instead of the elevator to increase daily physical activity.",
+    icon: "🪜",
+  },
+  {
+    category: "Hygiene",
+    tip: "Change your bedsheets weekly to prevent skin issues and allergies.",
+    icon: "🛏️",
+  },
+  {
+    category: "Nutrition",
+    tip: "Stay away from processed foods and cook fresh meals whenever possible.",
+    icon: "🍳",
+  },
+];
+
   ];
 
 
@@ -148,41 +275,36 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
     : allHealthTips;
 
 
-  
-  
-  
-  
-  
-  
-  const generateAiTip = () => {
-    setLoadingTip(true);
-    setAiTip(null); // Clear previous
+const generateAiTip = () => {
+  setLoadingTip(true);
+  setAiTip(null); // Clear previous tip
 
-    // Simulate AI Processing time (1.5 seconds)
-    setTimeout(() => {
-      // 1. Pick a random tip
-      const randomIndex = Math.floor(Math.random() * allHealthTips.length);
-      const rawTip = allHealthTips[randomIndex];
+  // Simulate AI processing delay
+  setTimeout(() => {
+    // Pick a random health tip
+    const randomIndex = Math.floor(Math.random() * allHealthTips.length);
+    const rawTip = allHealthTips[randomIndex];
 
-      // 2. Pick a random "AI Persona" intro
-      const intros = [
-        `Hello ${user?.name || "Friend"}, based on general wellness data, here is your focus:`,
-        "Analyzing your health profile... Here is a recommendation:",
-        "Medmitra AI suggests focusing on this today:",
-        "For optimal vitality, try incorporating this:",
-        "Here is a scientifically backed wellness tip for you:",
-      ];
-      const randomIntro = intros[Math.floor(Math.random() * intros.length)];
+    // AI-style intros
+    const intros = [
+      `Hello ${user?.name || "Friend"}, based on general wellness data, here is your focus:`,
+      "Analyzing your health profile... Here is a recommendation:",
+      "Medmitra AI suggests focusing on this today:",
+      "For optimal vitality, try incorporating this:",
+      "Here is a scientifically backed wellness tip for you:",
+    ];
 
-      // 3. Set the data
-      setAiTip({
-        intro: randomIntro,
-        ...rawTip
-      });
-      
-      setLoadingTip(false);
-    }, 1500);
-  };
+    const randomIntro = intros[Math.floor(Math.random() * intros.length)];
+
+    setAiTip({
+      intro: randomIntro,
+      ...rawTip,
+    });
+
+    setLoadingTip(false);
+  }, 1500);
+};
+
 
   // Fetch User
 
@@ -288,32 +410,29 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
 
   // Fetch outbreak data - Replace with real API call
 
-  // Fetch outbreak data - REAL LIVE API CALL
-  const fetchOutbreakData = async () => {
-    // 1. Get city from user profile
-    const userCity = user?.city; 
+// Fetch outbreak data - REAL LIVE API CALL
+const fetchOutbreakData = async () => {
+  const userCity = user?.city;
 
-    if (!userCity) {
-      alert("Please update your profile with your City to see local alerts.");
-      return;
-    }
+  if (!userCity) {
+    alert("Please update your profile with your City to see local alerts.");
+    return;
+  }
 
-    setLoadingOutbreaks(true);
+  setLoadingOutbreaks(true);
 
-    // 2. Call your new Backend Engine
-    axios.get(`http://localhost:3001/outbreaks?city=${userCity}`)
-      .then((res) => {
-        console.log("Outbreak Data:", res.data); // Debugging
-        setOutbreakData(res.data.alerts || []);
-        setLoadingOutbreaks(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching outbreaks:", err);
-        setLoadingOutbreaks(false);
-        // Optional: Show empty state or error state
-      });
-  };
-
+  axios
+    .get(`http://localhost:3001/outbreaks?city=${userCity}`)
+    .then((res) => {
+      console.log("Outbreak Data:", res.data);
+      setOutbreakData(res.data.alerts || []);
+      setLoadingOutbreaks(false);
+    })
+    .catch((err) => {
+      console.error("Error fetching outbreaks:", err);
+      setLoadingOutbreaks(false);
+    });
+};
 
   // Profile Toggle
 
@@ -398,36 +517,91 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
   // Find Hospitals
 
   const findNearbyHospitals = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
+// Safety checks before proceeding
+if (!navigator.geolocation) {
+  alert("Geolocation is not supported by your browser");
+  return;
+}
+
+if (!user?.city) {
+  alert("City information not available in your profile");
+  return;
+}
+
       return;
+
     }
 
     setSearchingHospitals(true);
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
+// Start searching
+setSearchingHospitals(true);
 
-        // Call backend with lat/lon instead of city
-        axios
-          .get(`http://localhost:3001/hospitals?lat=${latitude}&lon=${longitude}`)
-          .then((res) => {
-            setHospitals(res.data.hospitals || []);
-            setSearchingHospitals(false);
-          })
-          .catch((err) => {
-            console.log(err);
-            alert("Error finding hospitals");
-            setSearchingHospitals(false);
-          });
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-        alert("Unable to retrieve your location. Please allow location access.");
+// Prefer GPS-based search
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude } = position.coords;
+
+      // Call backend with lat/lon
+      axios
+        .get(
+          `http://localhost:3001/hospitals?lat=${latitude}&lon=${longitude}`
+        )
+        .then((res) => {
+          setHospitals(res.data.hospitals || []);
+          setSearchingHospitals(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("Error finding hospitals");
+          setSearchingHospitals(false);
+        });
+    },
+    () => {
+      // GPS denied → fallback to city
+      if (!user?.city) {
+        alert("Location access denied and city not available in profile.");
         setSearchingHospitals(false);
+        return;
       }
-    );
+
+      axios
+        .get(
+          `http://localhost:3001/hospitals?city=${user.city}&radius=5000`
+        )
+        .then((res) => {
+          setHospitals(res.data.hospitals || []);
+          setSearchingHospitals(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("Error finding hospitals");
+          setSearchingHospitals(false);
+        });
+    }
+  );
+} else {
+  // Browser does not support GPS → city fallback
+  if (!user?.city) {
+    alert("Geolocation not supported and city not available in profile.");
+    setSearchingHospitals(false);
+    return;
+  }
+
+  axios
+    .get(`http://localhost:3001/hospitals?city=${user.city}&radius=5000`)
+    .then((res) => {
+      setHospitals(res.data.hospitals || []);
+      setSearchingHospitals(false);
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("Error finding hospitals");
+      setSearchingHospitals(false);
+    });
+}
+
   };
 
 
@@ -435,24 +609,74 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
   // Emergency Help - FIXED
 
   // Emergency Help - CONNECTED TO BACKEND
-  // Emergency Help - CONNECTED TO BACKEND
-  const handleEmergency = () => {
-    if (!user || !user.email) return;
+// Emergency Help - CONNECTED TO BACKEND
+const handleEmergency = () => {
+  if (!user || !user.email) return;
 
-    axios.post(`http://localhost:3001/emergency/${user.email}`)
-      .then((res) => {
-        if (res.data.status === "NoContacts") {
-           alert("No emergency contacts found. Please Edit Profile -> Add Contacts.");
-           setEditMode(true);
-        } else {
-           alert(`🚨 EMERGENCY SENT 🚨\n\nAlert sent to ${res.data.matchedUsers} app users.\nSMS triggered for offline contacts.`);
+  axios
+    .post(`http://localhost:3001/emergency/${user.email}`)
+    .then((res) => {
+      const { status, message, notified, matchedUsers } = res.data;
+
+      // No or missing emergency contacts
+      if (status === "MissingContacts" || status === "NoContacts") {
+        alert(
+          (message || "No emergency contacts found.") +
+            "\n\nRedirecting to Edit Profile..."
+        );
+        setEditMode(true);
+        return;
+      }
+
+      // Success with detailed contact list
+      if (status === "Success" && Array.isArray(notified)) {
+        const contacts = notified.join("\n✓ ");
+        alert(
+          `🚨 EMERGENCY ALERTS SENT 🚨\n\nNotified:\n✓ ${contacts}\n\nHelp is on the way!`
+        );
+        return;
+      }
+
+      // Fallback success (backend matched app users)
+      if (matchedUsers) {
+        alert(
+          `🚨 EMERGENCY SENT 🚨\n\nAlert sent to ${matchedUsers} app users.\nSMS triggered for offline contacts.`
+        );
+        return;
+      }
+
+      // Unknown response
+      alert("Emergency request sent. Please stay calm and safe.");
+    })
+    .catch((err) => {
+      console.error("Emergency error:", err);
+      alert("Failed to send emergency alert. Please try again.");
+    });
+};
+
         }
       })
       .catch((err) => {
         console.error(err);
-        alert("Error sending alert. Check console for details.");
+.catch((err) => {
+  console.error("Emergency error:", err);
+
+  // Fallback if server responds with missing contacts
+  if (err.response && err.response.status === 400) {
+    alert("Please add emergency contacts in your profile first.");
+    setEditMode(true);
+  } 
+  // Critical fallback
+  else {
+    alert(
+      "Error sending alerts. Please call emergency numbers (100 / 102) immediately."
+    );
+  }
+});
+
       });
   };
+
 
   // Logout
 
@@ -546,14 +770,21 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
 
         <div className="header-right">
 
-         <div
-            className="notification-icon-wrapper"
-            onClick={() => setShowNotificationModal(true)} 
+<div
+  className="notification-icon-wrapper"
+  onClick={() => setShowNotificationModal(true)}
+>
+
           >
+
             <FaBell className="header-icon" />
+
             {notifications.length > 0 && (
+
               <span className="notification-badge">{notifications.length}</span>
+
             )}
+
           </div>
 
 
@@ -739,10 +970,11 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
 
             className="feature-card-home card-blue"
 
-            onClick={() => {
-              setShowHealthTips(true);
-              generateAiTip();
+onClick={() => {
+  setShowHealthTips(true);
+  generateAiTip();
 }}
+
 
           >
 
@@ -886,6 +1118,8 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
 
 
 
+{/* Inside Home.jsx Footer Section */}
+
           <div className="footer-section">
 
             <h4>Quick Links</h4>
@@ -893,32 +1127,27 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
             <ul>
 
               <li>
-
-                <a href="#about">About Us</a>
-
-              </li>
-
-              <li>
-
-                <a href="#contact">Contact</a>
+<a href="#about">About Us</a>
 
               </li>
 
               <li>
-
-                <a href="#privacy">Privacy Policy</a>
+<a href="#contact">Contact</a>
 
               </li>
 
               <li>
+<a href="#privacy">Privacy Policy</a>
 
-                <a href="#terms">Terms of Service</a>
+              </li>
+
+              <li>
+<a href="#terms">Terms of Service</a>
 
               </li>
 
             </ul>
-
-          </div>
+</div>
 
 
 
@@ -938,7 +1167,8 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
 
         <div className="footer-bottom">
 
-          <p>© 2024 Medmitra. All rights reserved.</p>
+<p>© 2025 Medmitra. All rights reserved.</p>
+
 
         </div>
 
@@ -1353,71 +1583,145 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
       {/* Health Tips Modal - ENHANCED */}
 
       {showHealthTips && (
+
         <div className="modal-overlay" onClick={() => setShowHealthTips(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{maxWidth: '500px', textAlign: 'center'}}>
-            <div className="modal-header" style={{ justifyContent: 'center', position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <FaRobot size={28} color="#2563eb" />
-                <h2 style={{margin: 0}}>Medmitra AI Insight</h2>
-              </div>
-              <FaTimes className="modal-close" onClick={() => setShowHealthTips(false)} style={{position: 'absolute', right: 0}} />
-            </div>
+<div
+  className="modal-content modal-large"
+  onClick={(e) => e.stopPropagation()}
+>
+  {/* ---------- HEADER ---------- */}
+  <div className="modal-header">
+    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <FaRobot size={24} color="#2563eb" />
+      <h2 style={{ margin: 0 }}>Health Tips & AI Insights</h2>
+    </div>
+    <FaTimes
+      className="modal-close"
+      onClick={() => setShowHealthTips(false)}
+    />
+  </div>
 
-            <div style={{ padding: '20px 0', minHeight: '200px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-              {loadingTip ? (
-                <>
-                  <div className="loading-spinner" style={{width: '40px', height: '40px', borderColor: '#2563eb transparent #2563eb transparent'}}></div>
-                  <p style={{marginTop: '15px', color: '#666', fontStyle: 'italic'}}>Analyzing health patterns...</p>
-                </>
-              ) : (
-                aiTip && (
-                  <div className="ai-result-card" style={{ animation: 'fadeIn 0.5s ease' }}>
-                    <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '15px' }}>
-                      {aiTip.intro}
-                    </p>
-                    
-                    <div style={{ 
-                      background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)', 
-                      padding: '25px', 
-                      borderRadius: '16px',
-                      border: '1px solid #bfdbfe',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                    }}>
-                      <div style={{ fontSize: '3rem', marginBottom: '10px' }}>{aiTip.icon}</div>
-                      <h3 style={{ color: '#1e40af', marginBottom: '10px', fontSize: '1.4rem' }}>{aiTip.category}</h3>
-                      <p style={{ color: '#1e3a8a', fontSize: '1.1rem', lineHeight: '1.6', fontWeight: '500' }}>
-                        "{aiTip.tip}"
-                      </p>
-                    </div>
+  {/* ---------- AI INSIGHT SECTION ---------- */}
+  <div
+    style={{
+      padding: "20px",
+      borderBottom: "1px solid #e5e7eb",
+      textAlign: "center",
+    }}
+  >
+    {loadingTip ? (
+      <>
+        <div
+          className="loading-spinner"
+          style={{
+            width: "40px",
+            height: "40px",
+            borderColor: "#2563eb transparent #2563eb transparent",
+          }}
+        />
+        <p style={{ marginTop: "15px", color: "#666", fontStyle: "italic" }}>
+          Analyzing health patterns...
+        </p>
+      </>
+    ) : (
+      aiTip && (
+        <div className="ai-result-card">
+          <p style={{ color: "#64748b", fontSize: "0.9rem" }}>
+            {aiTip.intro}
+          </p>
 
-                    <button 
-                      onClick={generateAiTip}
-                      style={{
-                        marginTop: '25px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '12px 24px',
-                        background: '#2563eb',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '30px',
-                        fontSize: '1rem',
-                        cursor: 'pointer',
-                        marginInline: 'auto',
-                        transition: 'transform 0.2s'
-                      }}
-                      onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-                      onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
-                    >
-                      <FaMagic /> Generate New Tip
-                    </button>
-                  </div>
-                )
-              )}
-            </div>
+          <div
+            style={{
+              background:
+                "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)",
+              padding: "20px",
+              borderRadius: "16px",
+              border: "1px solid #bfdbfe",
+              marginTop: "10px",
+            }}
+          >
+            <div style={{ fontSize: "2.5rem" }}>{aiTip.icon}</div>
+            <h3 style={{ color: "#1e40af" }}>{aiTip.category}</h3>
+            <p style={{ color: "#1e3a8a", fontWeight: "500" }}>
+              "{aiTip.tip}"
+            </p>
           </div>
+
+          <button
+            onClick={generateAiTip}
+            style={{
+              marginTop: "20px",
+              padding: "10px 22px",
+              background: "#2563eb",
+              color: "white",
+              border: "none",
+              borderRadius: "30px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginInline: "auto",
+            }}
+          >
+            <FaMagic /> Generate New Tip
+          </button>
         </div>
+      )
+    )}
+  </div>
+
+  {/* ---------- SEARCH ---------- */}
+  <div className="search-container">
+    <FaSearch className="search-icon" />
+    <input
+      type="text"
+      placeholder="Search health tips by category or keyword..."
+      value={healthTipsSearch}
+      onChange={(e) => setHealthTipsSearch(e.target.value)}
+      className="search-input"
+    />
+    {healthTipsSearch && (
+      <FaTimes
+        className="clear-search"
+        onClick={() => setHealthTipsSearch("")}
+      />
+    )}
+  </div>
+
+  <div className="tips-count">
+    Showing {filteredHealthTips.length} of {allHealthTips.length} health tips
+  </div>
+
+  {/* ---------- TIPS GRID ---------- */}
+  <div className="tips-grid-enhanced">
+    {filteredHealthTips.map((item, index) => (
+      <div key={index} className="tip-card-enhanced">
+        <div className="tip-icon">{item.icon}</div>
+        <div className="tip-content">
+          <span className="tip-category">{item.category}</span>
+          <p className="tip-text">{item.tip}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  {filteredHealthTips.length === 0 && (
+    <div className="no-results">
+      <p>No health tips found matching "{healthTipsSearch}"</p>
+      <button
+        onClick={() => setHealthTipsSearch("")}
+        className="btn-clear-search"
+      >
+        Clear Search
+      </button>
+    </div>
+  )}
+</div>
+
+          </div>
+
+        </div>
+
       )}
 
 
@@ -1485,35 +1789,62 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
                   hospitals.map((hospital, idx) => (
 
                     <div key={idx} className="hospital-card">
+
                       <div className="hospital-header">
+
                         <FaHospital className="hospital-icon" />
+
                         <h4>{hospital.name}</h4>
+
                       </div>
 
-                      {/* NEW: Show Distance if available */}
-                      {hospital.dist && (
-                        <p style={{color: '#2563eb', fontWeight: 'bold', fontSize: '0.9rem', margin: '5px 0'}}>
-                           📍 {(hospital.dist / 1000).toFixed(1)} km away
-                        </p>
-                      )}
+{/* NEW: Show Distance if available */}
+{hospital?.dist && (
+  <p
+    style={{
+      color: "#2563eb",
+      fontWeight: "bold",
+      fontSize: "0.9rem",
+      margin: "5px 0",
+    }}
+  >
+    📍 {(hospital.dist / 1000).toFixed(1)} km away
+  </p>
+)}
 
-                      <p className="hospital-address">
-                        {hospital?.address?.street || ""} {hospital?.address?.housenumber || ""}, {hospital?.address?.city || user.city}
+<p className="hospital-address">
+  📍 {hospital?.address?.street || ""}{" "}
+  {hospital?.address?.housenumber || ""},{" "}
+  {hospital?.address?.city || user.city}
+</p>
+
                       </p>
 
+
+
                       {hospital.phone && (
+
                         <p className="hospital-phone">📞 {hospital.phone}</p>
+
                       )}
 
-                      {/* FIXED GOOGLE MAPS LINK */}
+{/* FIXED GOOGLE MAPS LINK */}
+
                       <a
+
                         href={`https://www.google.com/maps/dir/?api=1&destination=${hospital.lat},${hospital.lon}`}
+
                         target="_blank"
+
                         rel="noopener noreferrer"
+
                         className="btn-directions"
+
                       >
-                        Get Directions 🗺️
+Get Directions 🗺️
+
                       </a>
+
                     </div>
 
                   ))
@@ -1648,24 +1979,63 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
 
                       </div>
 
-                      {/* ... inside outbreak-card, after outbreak-details ... */}
-                    
-                    <div className="outbreak-prevention" style={{marginTop: '15px', borderTop: '1px solid #eee', paddingTop: '10px'}}>
-                        <h5 style={{margin: '0 0 5px 0', color: '#333'}}>
-                          {outbreak.cases === "In News" || outbreak.cases === "Reported" ? "Latest News Headline:" : "Safety Tips:"}
-                        </h5>
-                        <ul style={{paddingLeft: '20px', margin: 0}}>
-                          {outbreak.tips && outbreak.tips.map((tip, tIdx) => (
-                            <li key={tIdx} style={{fontSize: '0.9rem', color: '#555', marginBottom: '4px'}}>
-                              {tip}
-                            </li>
-                          ))}
-                        </ul>
-                    </div>
+<div
+  className="outbreak-prevention"
+  style={{ marginTop: "15px", borderTop: "1px solid #eee", paddingTop: "10px" }}
+>
+  <h5 style={{ margin: "0 0 5px 0", color: "#333" }}>
+    Safety Tips:
+  </h5>
 
-                    {/* ... end of outbreak-card ... */}
+  <ul style={{ paddingLeft: "20px", margin: 0 }}>
+    {/* Prefer backend-provided tips */}
+    {Array.isArray(outbreak.tips) && outbreak.tips.length > 0 ? (
+      outbreak.tips.map((tip, tIdx) => (
+        <li
+          key={tIdx}
+          style={{ fontSize: "0.9rem", color: "#555", marginBottom: "4px" }}
+        >
+          {tip}
+        </li>
+      ))
+    ) : (
+      <>
+        {/* Fallback static tips by disease */}
+        {outbreak.disease === "Dengue" && (
+          <>
+            <li>Use mosquito repellent</li>
+            <li>Wear long-sleeved clothes</li>
+            <li>Remove standing water</li>
+          </>
+        )}
 
-                    </div>
+        {outbreak.disease === "Malaria" && (
+          <>
+            <li>Sleep under mosquito nets</li>
+            <li>Use insect repellent</li>
+            <li>Keep surroundings clean</li>
+          </>
+        )}
+
+        {outbreak.disease === "Typhoid" && (
+          <>
+            <li>Drink boiled or purified water</li>
+            <li>Wash hands frequently</li>
+            <li>Avoid street food</li>
+          </>
+        )}
+
+        {outbreak.disease === "Chikungunya" && (
+          <>
+            <li>Eliminate mosquito breeding sites</li>
+            <li>Use mosquito repellent</li>
+            <li>Wear protective clothing</li>
+          </>
+        )}
+      </>
+    )}
+  </ul>
+</div>
 
                   ))}
 
@@ -1987,61 +2357,125 @@ const [showNotificationModal, setShowNotificationModal] = useState(false);
 
       />
 
-        {/* ----------------------------- */}
-      {/* PURE NOTIFICATION MODAL       */}
-      {/* ----------------------------- */}
-      {showNotificationModal && (
-        <div className="modal-overlay" onClick={() => setShowNotificationModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '450px' }}>
-            <div className="modal-header">
-              <h2>🔔 Notifications</h2>
-              <FaTimes className="modal-close" onClick={() => setShowNotificationModal(false)} />
-            </div>
+{/* ----------------------------- */}
+{/* PURE NOTIFICATION MODAL       */}
+{/* ----------------------------- */}
+{showNotificationModal && (
+  <div
+    className="modal-overlay"
+    onClick={() => setShowNotificationModal(false)}
+  >
+    <div
+      className="modal-content"
+      onClick={(e) => e.stopPropagation()}
+      style={{ maxWidth: "450px" }}
+    >
+      <div className="modal-header">
+        <h2>🔔 Notifications</h2>
+        <FaTimes
+          className="modal-close"
+          onClick={() => setShowNotificationModal(false)}
+        />
+      </div>
 
-            <div className="notifications-list-container" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-              {notifications.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-                  <FaBell style={{ fontSize: '30px', marginBottom: '10px', opacity: 0.3 }} />
-                  <p>No new notifications</p>
-                </div>
-              ) : (
-                notifications.map((n, idx) => (
-                  <div 
-                    key={idx} 
-                    style={{
-                      padding: '15px',
-                      borderBottom: '1px solid #eee',
-                      backgroundColor: n.type === 'emergency' ? '#fff5f5' : '#fff',
-                      borderLeft: n.type === 'emergency' ? '4px solid #ef4444' : '4px solid #4299e1',
-                      marginBottom: '10px',
-                      borderRadius: '4px'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                      {n.type === 'emergency' ? (
-                        <FaExclamationTriangle color="#ef4444" style={{ marginRight: '8px' }} />
-                      ) : (
-                        <FaSyringe color="#4299e1" style={{ marginRight: '8px' }} />
-                      )}
-                      <strong style={{ color: '#333' }}>
-                        {n.type === 'emergency' ? "Emergency Alert" : "Vaccine Reminder"}
-                      </strong>
-                    </div>
-                    <p style={{ margin: 0, color: '#555', fontSize: '0.95rem' }}>{n.message}</p>
-                    <small style={{ color: '#999', marginTop: '5px', display: 'block' }}>
-                      {new Date(n.date).toLocaleDateString()}
-                    </small>
-                  </div>
-                ))
-              )}
-            </div>
-            
-            <div className="modal-actions">
-              <button className="btn-cancel" onClick={() => setShowNotificationModal(false)}>Close</button>
-            </div>
+      <div
+        className="notifications-list-container"
+        style={{ maxHeight: "400px", overflowY: "auto" }}
+      >
+        {notifications.length === 0 ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "20px",
+              color: "#666",
+            }}
+          >
+            <FaBell
+              style={{
+                fontSize: "30px",
+                marginBottom: "10px",
+                opacity: 0.3,
+              }}
+            />
+            <p>No new notifications</p>
           </div>
-        </div>
-      )}
+        ) : (
+          notifications.map((n, idx) => (
+            <div
+              key={idx}
+              style={{
+                padding: "15px",
+                borderBottom: "1px solid #eee",
+                backgroundColor:
+                  n.type === "emergency" ? "#fff5f5" : "#fff",
+                borderLeft:
+                  n.type === "emergency"
+                    ? "4px solid #ef4444"
+                    : "4px solid #4299e1",
+                marginBottom: "10px",
+                borderRadius: "4px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "5px",
+                }}
+              >
+                {n.type === "emergency" ? (
+                  <FaExclamationTriangle
+                    color="#ef4444"
+                    style={{ marginRight: "8px" }}
+                  />
+                ) : (
+                  <FaSyringe
+                    color="#4299e1"
+                    style={{ marginRight: "8px" }}
+                  />
+                )}
+                <strong style={{ color: "#333" }}>
+                  {n.type === "emergency"
+                    ? "Emergency Alert"
+                    : "Vaccine Reminder"}
+                </strong>
+              </div>
+
+              <p
+                style={{
+                  margin: 0,
+                  color: "#555",
+                  fontSize: "0.95rem",
+                }}
+              >
+                {n.message}
+              </p>
+
+              <small
+                style={{
+                  color: "#999",
+                  marginTop: "5px",
+                  display: "block",
+                }}
+              >
+                {new Date(n.date).toLocaleDateString()}
+              </small>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div className="modal-actions">
+        <button
+          className="btn-cancel"
+          onClick={() => setShowNotificationModal(false)}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
     </div>
 
