@@ -22,6 +22,10 @@ const EmployeeSchema = new mongoose.Schema({
   blood: String,
   disease: String,
   medicine: String,
+  member1 : String,
+  member2 : String,
+  phonemem1 : Number,
+  phonemem2 : Number ,
 
   vaccinations: [
     {
