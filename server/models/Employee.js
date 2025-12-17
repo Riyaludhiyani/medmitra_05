@@ -22,7 +22,10 @@ const EmployeeSchema = new mongoose.Schema({
   blood: String,
   disease: String,
   medicine: String,
-
+  member1name : String,
+  member1phone : Number,
+  member2name : String,
+  member2phone : Number,
   vaccinations: [
     {
       vaccineName: String,
