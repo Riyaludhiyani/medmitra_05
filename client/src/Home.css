@@ -961,3 +961,17 @@
   font-size: 14px;
 }
 
+/* Fix VAPI widgets visibility over modals */
+.modal-overlay {
+  z-index: 1000 !important;
+}
+
+.modal-content {
+  z-index: 1001 !important;
+}
+
+/* Ensure VAPI widgets stay on top */
+vapi-widget {
+  z-index: 10000 !important;
+  position: fixed !important;
+}
