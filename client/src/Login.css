@@ -190,3 +190,35 @@
     font-size: 1.5rem;
   }
 }
+
+
+
+/* Add these to your Login.css */
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* Make space for the icon so text doesn't overlap */
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 15px; /* Distance from the right edge */
+  cursor: pointer;
+  color: #6b7280; /* Gray color */
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.password-toggle-icon:hover {
+  color: #374151; /* Darker gray on hover */
+}
