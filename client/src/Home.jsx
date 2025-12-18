@@ -1,5 +1,8 @@
+/* eslint-disable no-unused-vars */
 // Home.js - COMPLETE IMPROVED VERSION
+
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import {
   FaUserCircle,
@@ -12,12 +15,16 @@ import {
   FaCalendarAlt,
   FaSearch,
   FaTimes,
+  FaRobot,
+  FaMagic,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
 function Home() {
+  const [onlyShowNotifications, setOnlyShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [showVaccinationForm, setShowVaccinationForm] = useState(false);
   const [showHealthTips, setShowHealthTips] = useState(false);
@@ -34,6 +41,8 @@ function Home() {
   const [healthTipsSearch, setHealthTipsSearch] = useState("");
   const [outbreakData, setOutbreakData] = useState([]);
   const [loadingOutbreaks, setLoadingOutbreaks] = useState(false);
+  const [aiTip, setAiTip] = useState(null);
+  const [loadingTip, setLoadingTip] = useState(false);
 
   const navigate = useNavigate();
 
@@ -206,6 +215,33 @@ function Home() {
       )
     : allHealthTips;
 
+  const generateAiTip = () => {
+    setLoadingTip(true);
+    setAiTip(null);
+
+    setTimeout(() => {
+      const randomIndex = Math.floor(Math.random() * allHealthTips.length);
+      const rawTip = allHealthTips[randomIndex];
+
+      const intros = [
+        `Hello ${user?.name || "Friend"}, based on general wellness data, here is your focus:`,
+        "Analyzing your health profile... Here is a recommendation:",
+        "Medmitra AI suggests focusing on this today:",
+        "For optimal vitality, try incorporating this:",
+        "Here is a scientifically backed wellness tip for you:",
+      ];
+
+      const randomIntro = intros[Math.floor(Math.random() * intros.length)];
+
+      setAiTip({
+        intro: randomIntro,
+        ...rawTip,
+      });
+
+      setLoadingTip(false);
+    }, 1500);
+  };
+
   // Fetch User
   useEffect(() => {
     const userEmail = localStorage.getItem("userEmail");
@@ -257,45 +293,28 @@ function Home() {
     }
   }, [showVaccinationSchedule, user?.email]);
 
-  // Fetch outbreak data - Replace with real API call
+  // Fetch outbreak data
   const fetchOutbreakData = async () => {
-    if (!user?.city) return;
+    const userCity = user?.city;
+
+    if (!userCity) {
+      alert("Please update your profile with your City to see local alerts.");
+      return;
+    }
+
     setLoadingOutbreaks(true);
 
-    // Simulated data - replace with real API
-    setTimeout(() => {
-      setOutbreakData([
-        {
-          disease: "Dengue",
-          cases: 45,
-          severity: "High",
-          lastUpdated: "2 days ago",
-          color: "#ef4444",
-        },
-        {
-          disease: "Malaria",
-          cases: 12,
-          severity: "Medium",
-          lastUpdated: "1 week ago",
-          color: "#f59e0b",
-        },
-        {
-          disease: "Typhoid",
-          cases: 8,
-          severity: "Low",
-          lastUpdated: "3 days ago",
-          color: "#10b981",
-        },
-        {
-          disease: "Chikungunya",
-          cases: 23,
-          severity: "Medium",
-          lastUpdated: "5 days ago",
-          color: "#f59e0b",
-        },
-      ]);
-      setLoadingOutbreaks(false);
-    }, 1000);
+    axios
+      .get(`http://localhost:3001/outbreaks?city=${userCity}`)
+      .then((res) => {
+        console.log("Outbreak Data:", res.data);
+        setOutbreakData(res.data.alerts || []);
+        setLoadingOutbreaks(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching outbreaks:", err);
+        setLoadingOutbreaks(false);
+      });
   };
 
   // Profile Toggle
@@ -340,50 +359,127 @@ function Home() {
 
   // Find Hospitals
   const findNearbyHospitals = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
     if (!user?.city) {
       alert("City information not available in your profile");
       return;
     }
+
     setSearchingHospitals(true);
-    axios
-      .get(`http://localhost:3001/hospitals?city=${user.city}&radius=5000`)
-      .then((res) => {
-        setHospitals(res.data.hospitals || []);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+
+          axios
+            .get(
+              `http://localhost:3001/hospitals?lat=${latitude}&lon=${longitude}`
+            )
+            .then((res) => {
+              setHospitals(res.data.hospitals || []);
+              setSearchingHospitals(false);
+            })
+            .catch((err) => {
+              console.error(err);
+              alert("Error finding hospitals");
+              setSearchingHospitals(false);
+            });
+        },
+        () => {
+          if (!user?.city) {
+            alert("Location access denied and city not available in profile.");
+            setSearchingHospitals(false);
+            return;
+          }
+
+          axios
+            .get(
+              `http://localhost:3001/hospitals?city=${user.city}&radius=5000`
+            )
+            .then((res) => {
+              setHospitals(res.data.hospitals || []);
+              setSearchingHospitals(false);
+            })
+            .catch((err) => {
+              console.error(err);
+              alert("Error finding hospitals");
+              setSearchingHospitals(false);
+            });
+        }
+      );
+    } else {
+      if (!user?.city) {
+        alert("Geolocation not supported and city not available in profile.");
         setSearchingHospitals(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        alert("Error finding hospitals");
-        setSearchingHospitals(false);
-      });
+        return;
+      }
+
+      axios
+        .get(`http://localhost:3001/hospitals?city=${user.city}&radius=5000`)
+        .then((res) => {
+          setHospitals(res.data.hospitals || []);
+          setSearchingHospitals(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("Error finding hospitals");
+          setSearchingHospitals(false);
+        });
+    }
   };
 
-  // Emergency Help - FIXED
+  // Emergency Help
   const handleEmergency = () => {
-    // Check if emergency contact fields exist in formData (from edit) or user object
-    const member1 = formData.member1 || user?.member1;
-    const phonemem1 = formData.phonemem1 || user?.phonemem1;
+    if (!user || !user.email) return;
 
-    if (!member1 || !phonemem1) {
-      alert(
-        "Please add emergency contacts in your profile first.\n\nGo to Edit Profile and add:\n- Emergency Contact 1 Name\n- Emergency Contact 1 Phone"
-      );
-      setEditMode(true);
-      return;
-    }
+    axios
+      .post(`http://localhost:3001/emergency/${user.email}`)
+      .then((res) => {
+        const { status, message, notified, matchedUsers } = res.data;
 
-    const message = `EMERGENCY ALERT: ${user.name} needs immediate help! Please contact them at ${user.phone1}. Location: ${user.address}, ${user.city}, ${user.state}`;
+        if (status === "MissingContacts" || status === "NoContacts") {
+          alert(
+            (message || "No emergency contacts found.") +
+              "\n\nRedirecting to Edit Profile..."
+          );
+          setEditMode(true);
+          return;
+        }
 
-    const member2 = formData.member2 || user?.member2;
-    const phonemem2 = formData.phonemem2 || user?.phonemem2;
+        if (status === "Success" && Array.isArray(notified)) {
+          const contacts = notified.join("\n✓ ");
+          alert(
+            `🚨 EMERGENCY ALERTS SENT 🚨\n\nNotified:\n✓ ${contacts}\n\nHelp is on the way!`
+          );
+          return;
+        }
 
-    alert(
-      `🚨 EMERGENCY NOTIFICATION SENT 🚨\n\nNotified:\n✓ ${member1}: ${phonemem1}${
-        member2 ? "\n✓ " + member2 + ": " + phonemem2 : ""
-      }\n\nMessage: "${message}"\n\n✅ In a real scenario, SMS/Call would be triggered immediately.`
-    );
+        if (matchedUsers) {
+          alert(
+            `🚨 EMERGENCY SENT 🚨\n\nAlert sent to ${matchedUsers} app users.\nSMS triggered for offline contacts.`
+          );
+          return;
+        }
 
-    console.log("Emergency contacts notified:", message);
+        alert("Emergency request sent. Please stay calm and safe.");
+      })
+      .catch((err) => {
+        console.error("Emergency error:", err);
+
+        if (err.response && err.response.status === 400) {
+          alert("Please add emergency contacts in your profile first.");
+          setEditMode(true);
+        } else {
+          alert(
+            "Error sending alerts. Please call emergency numbers (100 / 102) immediately."
+          );
+        }
+      });
   };
 
   // Logout
@@ -392,7 +488,7 @@ function Home() {
     navigate("/");
   };
 
-  // Load VAPI Widgets - MOVED OUTSIDE COMPONENT
+  // Load VAPI Widgets
   useEffect(() => {
     const script = document.createElement("script");
     script.src =
@@ -402,7 +498,6 @@ function Home() {
     document.body.appendChild(script);
 
     return () => {
-      // Cleanup: remove script when component unmounts
       document.body.removeChild(script);
     };
   }, []);
@@ -418,7 +513,7 @@ function Home() {
 
   return (
     <div className="home-dashboard">
-      {/* Header - Matching Landing Page Style */}
+      {/* Header */}
       <header className="dashboard-header">
         <div className="header-left">
           <div className="logo-section">
@@ -434,7 +529,7 @@ function Home() {
         <div className="header-right">
           <div
             className="notification-icon-wrapper"
-            onClick={() => setShowVaccinationSchedule(true)}
+            onClick={() => setShowNotificationModal(true)}
           >
             <FaBell className="header-icon" />
             {notifications.length > 0 && (
@@ -520,7 +615,10 @@ function Home() {
         <section className="features-grid">
           <div
             className="feature-card-home card-purple"
-            onClick={() => setShowVaccinationForm(true)}
+            onClick={() => {
+              setOnlyShowNotifications(false);
+              setShowVaccinationSchedule(true);
+            }}
           >
             <div className="feature-icon-wrapper">
               <FaSyringe className="feature-icon-large" />
@@ -531,7 +629,10 @@ function Home() {
 
           <div
             className="feature-card-home card-blue"
-            onClick={() => setShowHealthTips(true)}
+            onClick={() => {
+              setShowHealthTips(true);
+              generateAiTip();
+            }}
           >
             <div className="feature-icon-wrapper">
               <FaLightbulb className="feature-icon-large" />
@@ -589,7 +690,7 @@ function Home() {
         </section>
       </main>
 
-      {/* Footer - NEW */}
+      {/* Footer */}
       <footer className="dashboard-footer">
         <div className="footer-content">
           <div className="footer-section">
@@ -629,7 +730,7 @@ function Home() {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2024 Medmitra. All rights reserved.</p>
+          <p>© 2025 Medmitra. All rights reserved.</p>
         </div>
       </footer>
 
@@ -782,94 +883,149 @@ function Home() {
         </div>
       )}
 
-      {/* Vaccination Form Modal */}
-      {showVaccinationForm && (
+      {/* Vaccination Schedule Modal */}
+      {showVaccinationSchedule && (
         <div
           className="modal-overlay"
-          onClick={() => setShowVaccinationForm(false)}
+          onClick={() => setShowVaccinationSchedule(false)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content modal-large"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h2>Schedule New Vaccination</h2>
+              <h2>
+                {onlyShowNotifications
+                  ? "🔔 Notifications"
+                  : "📅 Your Vaccination Schedule"}
+              </h2>
               <FaTimes
                 className="modal-close"
-                onClick={() => setShowVaccinationForm(false)}
+                onClick={() => setShowVaccinationSchedule(false)}
               />
             </div>
-            <div className="form-grid">
-              <div className="form-group full-width">
-                <label>Vaccine Name</label>
-                <input
-                  type="text"
-                  placeholder="e.g., BCG, DPT, MMR, COVID-19"
-                  value={vaccineData.vaccineName}
-                  onChange={(e) =>
-                    setVaccineData({
-                      ...vaccineData,
-                      vaccineName: e.target.value,
-                    })
-                  }
-                />
+
+            {notifications.length > 0 ? (
+              <div className="notifications-section">
+                <h3>
+                  {onlyShowNotifications
+                    ? "Current Alerts"
+                    : "🔔 Today's Notifications"}
+                </h3>
+                {notifications.map((n, idx) => (
+                  <div key={idx} className="notification-item-modal">
+                    <FaBell className="notif-icon" />
+                    <span>{n.message}</span>
+                  </div>
+                ))}
               </div>
-              <div className="form-group">
-                <label>Dose Number</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={vaccineData.doseNumber}
-                  onChange={(e) =>
-                    setVaccineData({
-                      ...vaccineData,
-                      doseNumber: parseInt(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <div className="form-group">
-                <label>Total Doses</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={vaccineData.totalDoses}
-                  onChange={(e) =>
-                    setVaccineData({
-                      ...vaccineData,
-                      totalDoses: parseInt(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <div className="form-group full-width">
-                <label>Next Dose Date</label>
-                <input
-                  type="date"
-                  value={vaccineData.nextDoseDate}
-                  min={new Date().toISOString().split("T")[0]}
-                  onChange={(e) =>
-                    setVaccineData({
-                      ...vaccineData,
-                      nextDoseDate: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </div>
-            <div className="modal-actions">
-              <button className="btn-save" onClick={saveVaccine}>
-                Save Vaccination
-              </button>
-              <button
-                className="btn-cancel"
-                onClick={() => setShowVaccinationForm(false)}
-              >
-                Cancel
-              </button>
-            </div>
+            ) : (
+              onlyShowNotifications && (
+                <p className="no-data">
+                  No upcoming vaccinations in the next 7 days.
+                </p>
+              )
+            )}
+
+            {!onlyShowNotifications && (
+              <>
+                {user.vaccinations && user.vaccinations.length > 0 && (
+                  <>
+                    <h3
+                      style={{
+                        marginTop: "30px",
+                        marginBottom: "15px",
+                        color: "#2d3748",
+                      }}
+                    >
+                      Your Scheduled Vaccinations
+                    </h3>
+                    <div className="schedule-grid">
+                      {user.vaccinations.map((vac, idx) => (
+                        <div
+                          key={idx}
+                          className={`schedule-card ${
+                            vac.completed ? "status-completed" : "status-scheduled"
+                          }`}
+                        >
+                          <h4>{vac.vaccineName}</h4>
+                          <div className="schedule-details">
+                            <p>
+                              <strong>Dose:</strong> {vac.doseNumber} of{" "}
+                              {vac.totalDoses}
+                            </p>
+                            <p>
+                              <strong>Next Date:</strong>{" "}
+                              {new Date(vac.nextDoseDate).toLocaleDateString()}
+                            </p>
+                            <p>
+                              <strong>Status:</strong>
+                              <span
+                                className={`status-badge ${
+                                  vac.completed ? "completed" : "scheduled"
+                                }`}
+                              >
+                                {vac.completed ? "Completed" : "Scheduled"}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                <h3
+                  style={{
+                    marginTop: "30px",
+                    marginBottom: "15px",
+                    color: "#2d3748",
+                  }}
+                >
+                  Recommended Vaccination Schedule
+                </h3>
+                <div className="schedule-grid">
+                  {schedule.length === 0 ? (
+                    <p className="no-data">
+                      No vaccination schedule available. Please update your
+                      age/DOB in profile.
+                    </p>
+                  ) : (
+                    schedule.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className={`schedule-card status-${item.status}`}
+                      >
+                        <h4>{item.vaccineName}</h4>
+                        <div className="schedule-details">
+                          <p>
+                            <strong>Status:</strong>
+                            <span className={`status-badge ${item.status}`}>
+                              {item.status}
+                            </span>
+                          </p>
+                          <p>
+                            <strong>Doses:</strong> {item.dosesTaken} /{" "}
+                            {item.dosesRecommended}
+                          </p>
+                          {item.nextDueDate && (
+                            <p>
+                              <strong>Next Due:</strong>{" "}
+                              {new Date(item.nextDueDate).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
 
-      {/* Health Tips Modal - ENHANCED */}
+      {/* Health Tips Modal */}
       {showHealthTips && (
         <div className="modal-overlay" onClick={() => setShowHealthTips(false)}>
           <div
@@ -877,11 +1033,88 @@ function Home() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-header">
-              <h2>💡 Health Tips Library</h2>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <FaRobot size={24} color="#2563eb" />
+                <h2 style={{ margin: 0 }}>Health Tips & AI Insights</h2>
+              </div>
               <FaTimes
                 className="modal-close"
                 onClick={() => setShowHealthTips(false)}
               />
+            </div>
+
+            <div
+              style={{
+                padding: "20px",
+                borderBottom: "1px solid #e5e7eb",
+                textAlign: "center",
+              }}
+            >
+              {loadingTip ? (
+                <>
+                  <div
+                    className="loading-spinner"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderColor: "#2563eb transparent #2563eb transparent",
+                    }}
+                  />
+                  <p
+                    style={{
+                      marginTop: "15px",
+                      color: "#666",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    Analyzing health patterns...
+                  </p>
+                </>
+              ) : (
+                aiTip && (
+                  <div className="ai-result-card">
+                    <p style={{ color: "#64748b", fontSize: "0.9rem" }}>
+                      {aiTip.intro}
+                    </p>
+
+                    <div
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)",
+                        padding: "20px",
+                        borderRadius: "16px",
+                        border: "1px solid #bfdbfe",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <div style={{ fontSize: "2.5rem" }}>{aiTip.icon}</div>
+                      <h3 style={{ color: "#1e40af" }}>{aiTip.category}</h3>
+                      <p style={{ color: "#1e3a8a", fontWeight: "500" }}>
+                        "{aiTip.tip}"
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={generateAiTip}
+                      style={{
+                        marginTop: "20px",
+                        padding: "10px 22px",
+                        background: "#2563eb",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "30px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        marginInline: "auto",
+                      }}
+                    >
+                      <FaMagic /> Generate New Tip
+                    </button>
+                  </div>
+                )
+              )}
             </div>
 
             <div className="search-container">
@@ -970,6 +1203,19 @@ function Home() {
                         <h4>{hospital.name}</h4>
                       </div>
 
+                      {hospital?.dist && (
+                        <p
+                          style={{
+                            color: "#2563eb",
+                            fontWeight: "bold",
+                            fontSize: "0.9rem",
+                            margin: "5px 0",
+                          }}
+                        >
+                          📍 {(hospital.dist / 1000).toFixed(1)} km away
+                        </p>
+                      )}
+
                       <p className="hospital-address">
                         📍 {hospital?.address?.street || ""}{" "}
                         {hospital?.address?.housenumber || ""},{" "}
@@ -986,7 +1232,7 @@ function Home() {
                         rel="noopener noreferrer"
                         className="btn-directions"
                       >
-                        Get Directions →
+                        Get Directions 🗺️
                       </a>
                     </div>
                   ))
@@ -996,7 +1242,8 @@ function Home() {
           </div>
         </div>
       )}
-      {/* Outbreak Alerts Modal - NEW FUNCTIONAL */}
+
+      {/* Outbreak Alerts Modal */}
       {showOutbreakAlerts && (
         <div
           className="modal-overlay"
@@ -1055,35 +1302,67 @@ function Home() {
                           </span>
                         </div>
                       </div>
-                      <div className="outbreak-prevention">
-                        <h5>Prevention Tips:</h5>
-                        <ul>
-                          {outbreak.disease === "Dengue" && (
+
+                      <div
+                        className="outbreak-prevention"
+                        style={{
+                          marginTop: "15px",
+                          borderTop: "1px solid #eee",
+                          paddingTop: "10px",
+                        }}
+                      >
+                        <h5 style={{ margin: "0 0 5px 0", color: "#333" }}>
+                          Safety Tips:
+                        </h5>
+
+                        <ul style={{ paddingLeft: "20px", margin: 0 }}>
+                          {Array.isArray(outbreak.tips) &&
+                          outbreak.tips.length > 0 ? (
+                            outbreak.tips.map((tip, tIdx) => (
+                              <li
+                                key={tIdx}
+                                style={{
+                                  fontSize: "0.9rem",
+                                  color: "#555",
+                                  marginBottom: "4px",
+                                }}
+                              >
+                                {tip}
+                              </li>
+                            ))
+                          ) : (
                             <>
-                              <li>Use mosquito repellent</li>
-                              <li>Wear long-sleeved clothes</li>
-                              <li>Remove standing water</li>
-                            </>
-                          )}
-                          {outbreak.disease === "Malaria" && (
-                            <>
-                              <li>Sleep under mosquito nets</li>
-                              <li>Use insect repellent</li>
-                              <li>Keep surroundings clean</li>
-                            </>
-                          )}
-                          {outbreak.disease === "Typhoid" && (
-                            <>
-                              <li>Drink boiled or purified water</li>
-                              <li>Wash hands frequently</li>
-                              <li>Avoid street food</li>
-                            </>
-                          )}
-                          {outbreak.disease === "Chikungunya" && (
-                            <>
-                              <li>Eliminate mosquito breeding sites</li>
-                              <li>Use mosquito repellent</li>
-                              <li>Wear protective clothing</li>
+                              {outbreak.disease === "Dengue" && (
+                                <>
+                                  <li>Use mosquito repellent</li>
+                                  <li>Wear long-sleeved clothes</li>
+                                  <li>Remove standing water</li>
+                                </>
+                              )}
+
+                              {outbreak.disease === "Malaria" && (
+                                <>
+                                  <li>Sleep under mosquito nets</li>
+                                  <li>Use insect repellent</li>
+                                  <li>Keep surroundings clean</li>
+                                </>
+                              )}
+
+                              {outbreak.disease === "Typhoid" && (
+                                <>
+                                  <li>Drink boiled or purified water</li>
+                                  <li>Wash hands frequently</li>
+                                  <li>Avoid street food</li>
+                                </>
+                              )}
+
+                              {outbreak.disease === "Chikungunya" && (
+                                <>
+                                  <li>Eliminate mosquito breeding sites</li>
+                                  <li>Use mosquito repellent</li>
+                                  <li>Wear protective clothing</li>
+                                </>
+                              )}
                             </>
                           )}
                         </ul>
@@ -1097,152 +1376,144 @@ function Home() {
         </div>
       )}
 
-      {/* Vaccination Schedule Modal - ENHANCED */}
-      {showVaccinationSchedule && (
+      {/* Notification Modal */}
+      {showNotificationModal && (
         <div
           className="modal-overlay"
-          onClick={() => setShowVaccinationSchedule(false)}
+          onClick={() => setShowNotificationModal(false)}
         >
           <div
-            className="modal-content modal-large"
+            className="modal-content"
             onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: "450px" }}
           >
             <div className="modal-header">
-              <h2>📅 Your Vaccination Schedule</h2>
+              <h2>🔔 Notifications</h2>
               <FaTimes
                 className="modal-close"
-                onClick={() => setShowVaccinationSchedule(false)}
+                onClick={() => setShowNotificationModal(false)}
               />
             </div>
 
-            {notifications.length > 0 && (
-              <div className="notifications-section">
-                <h3>🔔 Today's Notifications</h3>
-                {notifications.map((n, idx) => (
-                  <div key={idx} className="notification-item-modal">
-                    <FaBell className="notif-icon" />
-                    <span>{n.message}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* User's Added Vaccinations */}
-            {user.vaccinations && user.vaccinations.length > 0 && (
-              <>
-                <h3
+            <div
+              className="notifications-list-container"
+              style={{ maxHeight: "400px", overflowY: "auto" }}
+            >
+              {notifications.length === 0 ? (
+                <div
                   style={{
-                    marginTop: "30px",
-                    marginBottom: "15px",
-                    color: "#2d3748",
+                    textAlign: "center",
+                    padding: "20px",
+                    color: "#666",
                   }}
                 >
-                  Your Scheduled Vaccinations
-                </h3>
-                <div className="schedule-grid">
-                  {user.vaccinations.map((vac, idx) => (
-                    <div
-                      key={idx}
-                      className={`schedule-card ${
-                        vac.completed ? "status-completed" : "status-scheduled"
-                      }`}
-                    >
-                      <h4>{vac.vaccineName}</h4>
-                      <div className="schedule-details">
-                        <p>
-                          <strong>Dose:</strong> {vac.doseNumber} of{" "}
-                          {vac.totalDoses}
-                        </p>
-                        <p>
-                          <strong>Next Date:</strong>{" "}
-                          {new Date(vac.nextDoseDate).toLocaleDateString()}
-                        </p>
-                        <p>
-                          <strong>Status:</strong>
-                          <span
-                            className={`status-badge ${
-                              vac.completed ? "completed" : "scheduled"
-                            }`}
-                          >
-                            {vac.completed ? "Completed" : "Scheduled"}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                  <FaBell
+                    style={{
+                      fontSize: "30px",
+                      marginBottom: "10px",
+                      opacity: 0.3,
+                    }}
+                  />
+                  <p>No new notifications</p>
                 </div>
-              </>
-            )}
-
-            {/* Recommended Schedule */}
-            <h3
-              style={{
-                marginTop: "30px",
-                marginBottom: "15px",
-                color: "#2d3748",
-              }}
-            >
-              Recommended Vaccination Schedule
-            </h3>
-            <div className="schedule-grid">
-              {schedule.length === 0 ? (
-                <p className="no-data">
-                  No vaccination schedule available. Please update your age/DOB
-                  in profile.
-                </p>
               ) : (
-                schedule.map((item, idx) => (
+                notifications.map((n, idx) => (
                   <div
                     key={idx}
-                    className={`schedule-card status-${item.status}`}
+                    style={{
+                      padding: "15px",
+                      borderBottom: "1px solid #eee",
+                      backgroundColor:
+                        n.type === "emergency" ? "#fff5f5" : "#fff",
+                      borderLeft:
+                        n.type === "emergency"
+                          ? "4px solid #ef4444"
+                          : "4px solid #4299e1",
+                      marginBottom: "10px",
+                      borderRadius: "4px",
+                    }}
                   >
-                    <h4>{item.vaccineName}</h4>
-                    <div className="schedule-details">
-                      <p>
-                        <strong>Status:</strong>
-                        <span className={`status-badge ${item.status}`}>
-                          {item.status}
-                        </span>
-                      </p>
-                      <p>
-                        <strong>Doses:</strong> {item.dosesTaken} /{" "}
-                        {item.dosesRecommended}
-                      </p>
-                      {item.nextDueDate && (
-                        <p>
-                          <strong>Next Due:</strong>{" "}
-                          {new Date(item.nextDueDate).toLocaleDateString()}
-                        </p>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      {n.type === "emergency" ? (
+                        <FaExclamationTriangle
+                          color="#ef4444"
+                          style={{ marginRight: "8px" }}
+                        />
+                      ) : (
+                        <FaSyringe
+                          color="#4299e1"
+                          style={{ marginRight: "8px" }}
+                        />
                       )}
+                      <strong style={{ color: "#333" }}>
+                        {n.type === "emergency"
+                          ? "Emergency Alert"
+                          : "Vaccine Reminder"}
+                      </strong>
                     </div>
+
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "#555",
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      {n.message}
+                    </p>
+
+                    <small
+                      style={{
+                        color: "#999",
+                        marginTop: "5px",
+                        display: "block",
+                      }}
+                    >
+                      {new Date(n.date).toLocaleDateString()}
+                    </small>
                   </div>
                 ))
               )}
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="btn-cancel"
+                onClick={() => setShowNotificationModal(false)}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* VAPI Widgets - ALWAYS VISIBLE */}
+      {/* VAPI Widgets */}
       <div
         dangerouslySetInnerHTML={{
           __html: `
-        <vapi-widget 
+        <vapi-widget
           public-key="62ff7d1e-8f8c-4ef8-8aaf-2244c3d76eb4"
           assistant-id="74f2e57b-87d3-419f-8c88-daad57c4ec05"
-          mode="chat" 
-          theme="dark" 
-          position="bottom-right" 
+          mode="chat"
+          theme="dark"
+          position="bottom-right"
           title="Chat with Medmitra"
           style="z-index: 9999;">
         </vapi-widget>
 
-        <vapi-widget 
+        <vapi-widget
           public-key="62ff7d1e-8f8c-4ef8-8aaf-2244c3d76eb4"
           assistant-id="74f2e57b-87d3-419f-8c88-daad57c4ec05"
-          mode="voice" 
-          theme="dark" 
-          position="bottom-left" 
+          mode="voice"
+          theme="dark"
+          position="bottom-left"
           title="Talk with Medmitra"
           style="z-index: 9999;">
         </vapi-widget>
@@ -1252,4 +1523,5 @@ function Home() {
     </div>
   );
 }
+
 export default Home;
