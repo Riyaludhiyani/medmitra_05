@@ -828,7 +828,6 @@ function Home() {
                 />
               </div>
 
-              {/* Emergency Contacts Section */}
               <div className="form-group full-width">
                 <h4 style={{ margin: "20px 0 10px 0", color: "#ef4444" }}>
                   🚨 Emergency Contacts
