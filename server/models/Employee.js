@@ -32,23 +32,25 @@ const EmployeeSchema = new mongoose.Schema({
   medicine: String,
   member1 : String,
   member2 : String,
-  
-  // ✅ THIS SECTION WAS MISSING CAUSING THE 500 ERROR
-  notifications: [
-    {
-      message: String,
-      type: String, 
-      date: { type: Date, default: Date.now },
-      read: { type: Boolean, default: false }
-    }
-  ],
-  
+phonemem1: Number,
+phonemem2: Number,
+
+// Notifications (required for alerts, vaccines, emergencies)
+notifications: [
+  {
+    message: String,
+    type: String,
+    date: { type: Date, default: Date.now },
+    read: { type: Boolean, default: false },
+  },
+],
+
   vaccinations: [
     {
       vaccineName: String,
       nextDoseDate: String,
       doseNumber: Number,
-      totalDoses: Number,
+      totalDoses: Number,  
       completed: { type: Boolean, default: false }
     }
   ]

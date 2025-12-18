@@ -16,11 +16,10 @@ const cron = require("node-cron");
 
 
 const app = express();
+const bcrypt = require("bcryptjs");
 
 app.use(express.json());
-
 app.use(cors());
-
 
 
 // -----------------------------------------
@@ -36,20 +35,47 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => console.log("MongoDB Error:", err));
 
 
-
 // -----------------------------------------
-
-// Register User
-
+// Register User (UPDATED: Strong Password + Hashing)
 // -----------------------------------------
+app.post("/register", async (req, res) => {
+  try {
+    const { name, email, password, ...otherData } = req.body;
 
-app.post("/register", (req, res) => {
+    // 1. Check if user already exists
+    const existingUser = await EmployeeModel.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
-  EmployeeModel.create(req.body)
+    // 2. STRONG PASSWORD VALIDATION
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    .then((emp) => res.json(emp))
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.",
+      });
+    }
 
-    .catch((err) => res.status(500).json({ error: err.message }));
+    // 3. HASH PASSWORD
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // 4. SAVE USER WITH HASHED PASSWORD
+    const newUser = await EmployeeModel.create({
+      name,
+      email,
+      password: hashedPassword,
+      ...otherData,
+    });
+
+    res.status(201).json(newUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 });
 
@@ -61,40 +87,31 @@ app.post("/register", (req, res) => {
 
 // -----------------------------------------
 
-app.post("/login", (req, res) => {
-
+// -----------------------------------------
+// Login (UPDATED: Hash Comparison)
+// -----------------------------------------
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
+  try {
+    const user = await EmployeeModel.findOne({ email });
 
+    if (!user) {
+      return res.json({ status: "No record existed" });
+    }
 
-  EmployeeModel.findOne({ email })
+    // Compare plain password with hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
 
-    .then((user) => {
-
-      if (!user) return res.json({ status: "No record existed" });
-
-
-
-      if (user.password === password) {
-
-        return res.json({ status: "Success" });
-
-      } else {
-
-        return res.json({ status: "Incorrect password" });
-
-      }
-
-    })
-
-    .catch((err) => res.json({ status: "Error", error: err }));
-
+    if (isMatch) {
+      return res.json({ status: "Success", user });
+    } else {
+      return res.json({ status: "Incorrect password" });
+    }
+  } catch (err) {
+    res.json({ status: "Error", error: err.message });
+  }
 });
-
-
-
-
-
 
 
 //----------------------------
@@ -102,21 +119,20 @@ app.post("/login", (req, res) => {
 // ----------------------------
 app.get("/outbreaks", async (req, res) => {
   const rawCity = req.query.city;
-  
-  // Default response if no city provided
+
   if (!rawCity) return res.json({ alerts: [] });
 
   const city = rawCity.trim();
   let alerts = [];
 
   try {
-    // 1. Search Google News for this specific city
     const query = `${city} (outbreak OR disease OR virus OR hospital OR cases OR dengue OR malaria OR flu OR pollution)`;
-    const feedUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}+when:30d&hl=en-IN&gl=IN&ceid=IN:en`;
-    
+    const feedUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(
+      query
+    )}+when:30d&hl=en-IN&gl=IN&ceid=IN:en`;
+
     const feed = await parser.parseURL(feedUrl);
-    
-    // 2. define keywords to catch in the headlines
+
     const keywords = [
       { term: "dengue", name: "Dengue Alert", color: "#ef4444" },
       { term: "malaria", name: "Malaria Alert", color: "#f59e0b" },
@@ -131,56 +147,52 @@ app.get("/outbreaks", async (req, res) => {
       { term: "aqi", name: "High Pollution", color: "#7f1d1d" },
       { term: "smog", name: "Smog Alert", color: "#7f1d1d" },
       { term: "zika", name: "Zika Virus", color: "#ef4444" },
-      { term: "covid", name: "COVID-19", color: "#ef4444" }
+      { term: "covid", name: "COVID-19", color: "#ef4444" },
     ];
 
-    // 3. Scan headlines
     const seenDiseases = new Set();
 
-    feed.items.forEach(item => {
+    feed.items.forEach((item) => {
       const title = item.title.toLowerCase();
-      
-      keywords.forEach(k => {
-        // If headline contains a disease keyword AND we haven't added it yet
+
+      keywords.forEach((k) => {
         if (title.includes(k.term) && !seenDiseases.has(k.name)) {
           seenDiseases.add(k.name);
-          
+
           alerts.push({
             disease: k.name,
-            severity: "In News", // Honest severity
+            severity: "In News",
             color: k.color,
             cases: "Reported",
             lastUpdated: new Date(item.pubDate).toLocaleDateString(),
-            tips: [`Headline: "${item.title.substring(0, 60)}..."`] // Show actual news snippet
+            tips: [`Headline: "${item.title.substring(0, 60)}..."`],
           });
         }
       });
     });
-
   } catch (err) {
     console.error("RSS Scan Error:", err.message);
   }
 
-  // -----------------------------------------
-  // IF NO NEWS FOUND -> SHOW "STAY SAFE" MESSAGE
-  // -----------------------------------------
   if (alerts.length === 0) {
     alerts.push({
       disease: "No Active Outbreaks",
       severity: "Safe",
-      color: "#10b981", // Green color for safety
+      color: "#10b981",
       cases: "Zero Reports",
       lastUpdated: "Just Now",
       tips: [
         "Great news! No major disease outbreaks reported in your area recently.",
         "Maintain good hygiene to stay healthy.",
         "Drink plenty of water and eat fresh food.",
-        "Stay active and get good sleep."
-      ]
+        "Stay active and get good sleep.",
+      ],
     });
   }
 
   res.json({ city: rawCity, alerts });
+});
+
 });
 
 
